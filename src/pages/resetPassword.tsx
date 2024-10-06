@@ -94,62 +94,7 @@ export const SignIn = () => {
                     />
                   </div>
                 </div>
-  
-                <div className="input_subsection">
-                  <label htmlFor="password" className="subsection_title">
-                    パスワード
-                  </label>
-                  <div className="text_field">
-                  <TextField
-                    id="password"
-                    type={showPassword ? "password":"text"}
-                    fullWidth
-                      variant="outlined"
-                      sx={{
-                        backgroundColor: "white",
-                        '& .MuiInputBase-input': {
-                            height: '100%',
-                            padding: '10px', 
-                        },
-                        '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                            borderColor: '#96C78C', // フォーカス時のボーダー色
-                        },
-                        '& .MuiFormHelperText-root': { // ここを修正
-                            margin: '0px', // マージンを0に設定
-                        },
-                    }}
-                    {...register("password", {
-                        required: "パスワードは必須です",
-                        minLength: {
-                        value: 6,
-                        message: "パスワードは6文字以上で入力してください",
-                        },
-                        maxLength: {
-                        value: 12,
-                        message: "パスワードは12文字以内で入力してください",
-                        },
-                    })}
-                    error={!!errors.password}
-                    helperText={errors.password?.message}
-                    slotProps={{
-                        input: {
-                          endAdornment: (
-                            <InputAdornment position="end">
-                              <IconButton
-                                aria-label="toggle password visibility"
-                                onClick={handleClickShowPassword}
-                                onMouseDown={handleMouseDownPassword}
-                              >
-                                {showPassword ? <VisibilityOff /> : <Visibility />}
-                              </IconButton>
-                            </InputAdornment>
-                          ),
-                        },
-                      }}                
-                    />
 
-                  </div>
-                </div>
               </fieldset>
   
               <div className="button_field">
@@ -166,19 +111,14 @@ export const SignIn = () => {
                     },
                   }}
                 >
-                  ログイン
+                  パスワードをリセット
                 </Button>
               </div>
               <div className="linkItem">
                 <ul>
                     <li>
-                        <Link to={"/signup"} >
-                            アカウント作成
-                        </Link>
-                    </li>
-                    <li>
-                        <Link to={"/signup"} >
-                            パスワードを忘れた
+                        <Link to={"/signin"} >
+                            ログイン
                         </Link>
                     </li>
                 </ul>
