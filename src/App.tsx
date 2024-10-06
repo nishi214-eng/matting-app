@@ -1,7 +1,4 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
-import SignIn from './pages/signIn';
+import { SignIn } from './pages/signIn';
 import SignUp from './pages/signUp';
 import { BrowserRouter, Route, Routes} from "react-router-dom";
 
