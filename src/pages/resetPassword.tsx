@@ -2,57 +2,42 @@ import { useForm, SubmitHandler } from "react-hook-form"
 
 import { useEffect,useState } from "react";
 import { auth } from "../infra/firebase";
-import { signInWithEmailAndPassword } from "firebase/auth";
+import { sendPasswordResetEmail } from "firebase/auth";
 import { TextField, Button } from "@mui/material";
 import { signOut } from "firebase/auth";
 import { Link, Navigate } from "react-router-dom";
 
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
-import { Visibility } from "@mui/icons-material";
-import { VisibilityOff } from "@mui/icons-material";
 
 import "../style/auth.css";
 
-interface SigninForm {
+interface ResetPasswordForm {
   email: string
-  password: string
 }
 
-export const SignIn = () => {
+export const ResetPassword = () => {
     //const { showAlert } = useContext(AlertContext);
   
     // React Hook Formの使用
-    const { register, handleSubmit, formState: { errors } } = useForm<SigninForm>(); // useForm関数をLoginForm型で呼び出す
+    const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordForm>(); // useForm関数をLoginForm型で呼び出す
   
     // ページ読み込み時にログアウトする
     useEffect(() => {
       signOut(auth);
     }, []);
   
-    const onSubmit: SubmitHandler<SigninForm> = async (data) => {
-      const { email, password } = data;
+    const onSubmit: SubmitHandler<ResetPasswordForm> = async (data) => {
+      const { email } = data;
   
-      try {
-        // サインインの実行
-        await signInWithEmailAndPassword(auth, email, password);
-        // 次ページに遷移  
-        // Navigate("../Home")
-
-      } catch {
-        // エラー処理
-        console.log("エラーだよ！！！！！！！！！！！！！")
-        // showAlert("メールアドレスまたはパスワードが異なります。", "error");
+      const actionCodeSettings = {
+        // パスワード再設定後のリダイレクト URL本番環境では変更
+        url: 'http://localhost:3000/login',
       }
-    };
-  
-    // パスワードの表示可否を切りかえる状態変数
-    const [showPassword, setShowPassword] = useState(false);
-    // パスワードの表示可否を切り替える関数
-    const handleClickShowPassword = () => setShowPassword((show) => !show);
-    // ボタンを押下したときに余計な動作を防ぐ
-    const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
-      event.preventDefault();
+      try{
+        sendPasswordResetEmail(auth, email, actionCodeSettings)
+        console.log(`${email}にメールを送信しました`)
+      }catch(error){
+        console.log(error)
+      }
     };
   
     return (
@@ -94,7 +79,6 @@ export const SignIn = () => {
                     />
                   </div>
                 </div>
-
               </fieldset>
   
               <div className="button_field">
@@ -117,7 +101,7 @@ export const SignIn = () => {
               <div className="linkItem">
                 <ul>
                     <li>
-                        <Link to={"/signin"} >
+                        <Link to={"/"} >
                             ログイン
                         </Link>
                     </li>

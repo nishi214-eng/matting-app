@@ -177,7 +177,7 @@ export const SignIn = () => {
                         </Link>
                     </li>
                     <li>
-                        <Link to={"/signup"} >
+                        <Link to={"/ResetPassword"} >
                             パスワードを忘れた
                         </Link>
                     </li>
