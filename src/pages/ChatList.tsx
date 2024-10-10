@@ -2,17 +2,17 @@
 
 import { useEffect, useState } from "react";
 import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
-import { db } from "./infra/firebase";
+import { db } from "../infra/firebase";
 
-// ChatƒCƒ“ƒ^[ƒtƒF[ƒX‚ÉV‚µ‚¢ƒvƒƒpƒeƒB‚ğ’Ç‰Á
+// Chatï¿½Cï¿½ï¿½ï¿½^ï¿½[ï¿½tï¿½Fï¿½[ï¿½Xï¿½ÉVï¿½ï¿½ï¿½ï¿½ï¿½vï¿½ï¿½ï¿½pï¿½eï¿½Bï¿½ï¿½Ç‰ï¿½
 interface Chat {
     id: string; //ID
-    userName: string; //–¼‘O
-    lastMessage: string; //ÅVƒƒbƒZ
-    timestamp: number; //ŠÔ
-    userImage: string; // ƒ†[ƒU[‰æ‘œ
-    age: number;       // ”N—î
-    origin: string;    // og’n
+    userName: string; //ï¿½ï¿½ï¿½O
+    lastMessage: string; //ï¿½ÅVï¿½ï¿½ï¿½bï¿½Z
+    timestamp: number; //ï¿½ï¿½ï¿½ï¿½
+    userImage: string; // ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½æ‘œ
+    age: number;       // ï¿½Nï¿½ï¿½
+    origin: string;    // ï¿½oï¿½gï¿½n
 }
 
 function ChatList() {
@@ -26,20 +26,20 @@ function ChatList() {
                 const querySnapshot = await getDocs(collection(db, "chats"));
                 const chatData = querySnapshot.docs.map(
                     (doc: QueryDocumentSnapshot<DocumentData>): Chat => ({
-                        id: doc.id,//ID‚ğæ“¾
-                        userName: doc.data().userName,//–¼‘O‚ğæ“¾
-                        lastMessage: doc.data().lastMessage,//ÅVƒƒbƒZ‚ğæ“¾
-                        timestamp: doc.data().timestamp,//ŠÔ‚ğæ“¾
-                        userImage: doc.data().userImage, // ƒ†[ƒU[‰æ‘œ‚ğæ“¾
-                        age: doc.data().age,               // ”N—î‚ğæ“¾
-                        origin: doc.data().origin,         // og’n‚ğæ“¾
+                        id: doc.id,//IDï¿½ï¿½ï¿½æ“¾
+                        userName: doc.data().userName,//ï¿½ï¿½ï¿½Oï¿½ï¿½ï¿½æ“¾
+                        lastMessage: doc.data().lastMessage,//ï¿½ÅVï¿½ï¿½ï¿½bï¿½Zï¿½ï¿½ï¿½æ“¾
+                        timestamp: doc.data().timestamp,//ï¿½ï¿½ï¿½Ô‚ï¿½ï¿½æ“¾
+                        userImage: doc.data().userImage, // ï¿½ï¿½ï¿½[ï¿½Uï¿½[ï¿½æ‘œï¿½ï¿½ï¿½æ“¾
+                        age: doc.data().age,               // ï¿½Nï¿½ï¿½ï¿½ï¿½æ“¾
+                        origin: doc.data().origin,         // ï¿½oï¿½gï¿½nï¿½ï¿½ï¿½æ“¾
                     })
                 );
 
-                console.log("Fetched chats:", chatData); // æ“¾‚µ‚½ƒf[ƒ^‚ğƒRƒ“ƒ\[ƒ‹‚Éo—Í
+                console.log("Fetched chats:", chatData); // ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½Éoï¿½ï¿½
                 setChats(chatData);
             } catch (err) {
-                console.error("Error fetching chats:", err); // ƒGƒ‰[‚ğƒRƒ“ƒ\[ƒ‹‚Éo—Í
+                console.error("Error fetching chats:", err); // ï¿½Gï¿½ï¿½ï¿½[ï¿½ï¿½ï¿½Rï¿½ï¿½ï¿½\ï¿½[ï¿½ï¿½ï¿½Éoï¿½ï¿½
                 setError("Failed to fetch chats.");
             } finally {
                 setLoading(false);
@@ -59,13 +59,13 @@ function ChatList() {
 
     return (
         <div>
-            <h2>ƒg[ƒN</h2>
+            <h2>ï¿½gï¿½[ï¿½N</h2>
             <ul className="chat-list">
                 {chats.map((chat) => (
                     <li key={chat.id} className="chat-item">
                         <img src={chat.userImage} alt={chat.userName} className="user-image" />
                         <div className="chat-details"> 
-                            <h3>{chat.userName}  {chat.age}Î  {chat.origin}</h3>
+                            <h3>{chat.userName}  {chat.age}ï¿½ï¿½  {chat.origin}</h3>
                             <p className="last-message">{chat.lastMessage}</p>
                         </div>
                         <small className="timestamp">{new Date(chat.timestamp * 1000).toLocaleString()}</small>
