@@ -8,8 +8,6 @@ function App() {
   return (
     <div className="App">
       <header className="App-header">
-      <h1>運転免許証のアップロード</h1>
-      <LicenseUpload />
       </header>
       <ChatList />
     </div>
