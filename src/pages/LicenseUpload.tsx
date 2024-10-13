@@ -1,7 +1,7 @@
 // src/components/LicenseUpload.tsx
 import React, { useState } from "react";
 import { getStorage, ref, uploadBytes } from "firebase/storage";
-import { storage } from "./infra/firebase";
+import { storage } from "../infra/firebase";
 
 const LicenseUpload: React.FC = () => {
   const [imageFile, setImageFile] = useState<File | null>(null);
