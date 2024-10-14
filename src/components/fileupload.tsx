@@ -1,40 +1,38 @@
 import React, { useState } from 'react';
+import { useForm, SubmitHandler } from 'react-hook-form';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
-import { storage } from '../infra/firebase'; // Firebase Storage を初期化したファイルのパスを指定
+import { storage } from '../infra/firebase'; 
 import { v4 as uuidv4 } from 'uuid';
+import { Button, CircularProgress, TextField, Typography, Box } from '@mui/material';
+import { Link, Navigate } from 'react-router-dom';
+import "../style/auth.css";
 
-const FileUpload: React.FC = () => {
-  const [file, setFile] = useState<File | null>(null);
-  const [fileName, setFileName] = useState<string>('');
+interface FileUploadForm {
+  file: FileList;
+}
+
+export const FileUpload: React.FC = () => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
+  const [redirect, setRedirect] = useState<boolean>(false); // リダイレクト状態管理
 
-  // ファイル選択ハンドラー
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFile = event.target.files?.[0] || null;
-    if (selectedFile) {
-      setFile(selectedFile);
-      setFileName(selectedFile.name);
-    } else {
-      setFile(null);
-      setFileName('');
-    }
-  };
+  // React Hook Formの使用
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FileUploadForm>();
 
   // ファイルアップロード処理
-  const handleSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const onSubmit: SubmitHandler<FileUploadForm> = async (data) => {
+    const file = data.file[0];
     if (!file) return;
 
     setUploading(true);
-    const fileRef = ref(storage, `uploads/${uuidv4()}_${file.name}`); // ユニークなファイル名にする
+    const fileRef = ref(storage, `uploads/${uuidv4()}_${file.name}`);
 
     try {
-      // Firebase Storageにファイルをアップロード
       await uploadBytes(fileRef, file);
       const url = await getDownloadURL(fileRef);
-      setDownloadURL(url); // アップロード完了後のURLを取得
-      console.log('ファイルアップロード成功:', url);
+      setDownloadURL(url);
+      setRedirect(true); // アップロード成功時にリダイレクトフラグをセット
+      reset();
     } catch (error) {
       console.error('ファイルアップロードエラー:', error);
     } finally {
@@ -42,25 +40,89 @@ const FileUpload: React.FC = () => {
     }
   };
 
+  // リダイレクトの処理
+  if (redirect) {
+    return <Navigate to="/success" />; // 成功ページへリダイレクト
+  }
+
   return (
-    <div>
-      <h2>ファイルアップロード</h2>
-      <form onSubmit={handleSubmit}>
-        <div>
-          <label>画像ファイルをアップロード:</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
+    <div className="form_container">
+      <section className="form_wrapper">
+        <div className="form_outer">
+          <form onSubmit={handleSubmit(onSubmit)} aria-label="ファイルアップロードフォーム">
+            <fieldset className="input_section">
+              <div className="input_subsection">
+                <label htmlFor="file" className="subsection_title">
+                  アップロードするファイル
+                </label>
+                <div className="text_field">
+                  <TextField
+                    id="file"
+                    type="file"
+                    fullWidth
+                    variant="outlined"
+                    inputProps={{
+                      accept: 'image/*',
+                    }}
+                    sx={{
+                      backgroundColor: 'white',
+                      '& .MuiInputBase-input': {
+                        height: '100%',
+                        padding: '10px',
+                        border: '0px',
+                      },
+                      '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                        borderColor: '#96C78C', // フォーカス時のボーダー色
+                      },
+                    }}
+                    {...register("file", {
+                      required: "ファイルは必須です",
+                    })}
+                    error={!!errors.file}
+                    helperText={errors.file?.message}
+                  />
+                </div>
+              </div>
+            </fieldset>
+
+            <div className="button_field">
+              <Button
+                variant="contained"
+                type="submit"
+                sx={{
+                  width: '100%',
+                  borderRadius: '1%',
+                  backgroundColor: '#96C78C',
+                  boxShadow: 'none',
+                  '&:hover': {
+                    backgroundColor: '98C78C',
+                  },
+                }}
+                disabled={uploading}
+              >
+                {uploading ? <CircularProgress size={24} /> : 'アップロード'}
+              </Button>
+            </div>
+
+            {downloadURL && (
+              <div className="linkItem">
+                <Typography variant="body1">
+                  アップロードされたファイルのURL:
+                </Typography>
+                <a href={downloadURL} target="_blank" rel="noopener noreferrer">{downloadURL}</a>
+              </div>
+            )}
+
+            <div className="linkItem">
+              <ul>
+                <li>
+                  <Link to="/">ログイン</Link>
+                </li>
+              </ul>
+            </div>
+          </form>
         </div>
-        {fileName && <p>選択されたファイル: {fileName}</p>}
-        <button type="submit" disabled={uploading}>
-          {uploading ? 'アップロード中...' : 'アップロード'}
-        </button>
-      </form>
-      {downloadURL && (
-        <div>
-          <p>アップロードされたファイルのURL:</p>
-          <a href={downloadURL} target="_blank" rel="noopener noreferrer">{downloadURL}</a>
-        </div>
-      )}
+      </section>
     </div>
   );
 };
