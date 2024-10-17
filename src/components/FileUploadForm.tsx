@@ -1,4 +1,5 @@
 // components/FileUploadForm.tsx
+//         <Route path="/" element={<Navigate to="/FileUploadForm" />} />  {/* デフォルトルート */}<Route path="/FileUploadForm" element={<FileUploadForm />} /> 
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { uploadFile } from '../feature/uploadFile'; // ファイルアップロードの機能をインポート
