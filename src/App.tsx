@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes} from "react-router-dom";
 import './App.css';
 import ChatList from './pages/ChatList';
 import ProfileForm from './pages/ProfileForm';
+import Chat from './pages/Chat';
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
           <Route path="/SignUp" element={<SignUp />} />
           <Route path="/ResetPassword" element={<ResetPassword />} />
           <Route path="/ChatList" element={<ChatList />} />
+          <Route path="/Chat" element={<Chat/>} />
           <Route path="/ProfileForm" element={<ProfileForm />} />
           <Route path="*" element={<h1>Not Found Page</h1>} />
         </Routes>
