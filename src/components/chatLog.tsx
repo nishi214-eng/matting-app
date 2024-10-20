@@ -10,6 +10,7 @@ import {
   limit,
 } from 'firebase/firestore';
 import { useAuthContext } from '../store/AuthContext';
+import { sortName } from '../feature/sortName';
 
 type ChatLog = {
   key: string;
@@ -33,11 +34,12 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
     
     // 利用中のユーザーののユーザーネームを取得
     const {user} = useAuthContext(); 
+    
+    const userName = user?.displayName||"";
 
-    const userName = user?.displayName;
-
-    // userとmyNameの並びを一意にする関数
-    const chatRoomName = partnerName + "_" + userName
+    // userとmyNameの並びを一意にすることでchatRoomの名前を特定
+    const sortNameArray = sortName(partnerName,userName);
+    const chatRoomName = sortNameArray[0] + "_" + sortNameArray[1];
     
     // チャットルーム名
     let chatRef = collection(db, 'chatroom',chatRoomName, 'messages');
