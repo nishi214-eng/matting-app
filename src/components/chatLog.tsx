@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect } from 'react';
 import { db } from '../infra/firebase';
 import {
   collection,
@@ -8,6 +8,9 @@ import {
   query,
   orderBy,
   limit,
+  doc,
+  setDoc,
+  increment
 } from 'firebase/firestore';
 import { useAuthContext } from '../store/AuthContext';
 import { sortName } from '../feature/sortName';
@@ -50,7 +53,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
 
     // チャットルーム名
     let chatRef = collection(db, 'chatroom',chatRoomName, 'messages');
-
+    
     //チャットログに追加
     const addLog = (id: string, data: any) => {
         const log = {
@@ -77,6 +80,13 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
                 msg: message,
                 date: new Date().getTime(),
             });
+            const countRef = doc(
+                db, 
+                'chatroom', chatRoomName, 
+                'chatcount', 
+                userName === sortNameArray[0] ? 'count1' : 'count2'
+            );
+            await setDoc(countRef, { count: increment(1) }, { merge: true }); // 初期値を0に設定
         }
 
         setInputMsg('');
