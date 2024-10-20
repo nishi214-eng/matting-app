@@ -3,7 +3,7 @@ import ChatLogView from '../components/chatLog';
 import { useAuthContext } from '../store/AuthContext';
 
 const Chat: React.FC = () => {
-    let partnerName = "佐藤次郎"
+    let partnerName = "花山薫"
     const {user} = useAuthContext(); 
     return (
         <div>

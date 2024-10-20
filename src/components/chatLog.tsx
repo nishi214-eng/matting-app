@@ -11,6 +11,13 @@ import {
 } from 'firebase/firestore';
 import { useAuthContext } from '../store/AuthContext';
 import { sortName } from '../feature/sortName';
+import '../style/chatPage.css'
+
+import { TextField, Button } from "@mui/material";
+import IconButton from '@mui/material/IconButton';
+import InputAdornment from '@mui/material/InputAdornment';
+import { Send } from '@mui/icons-material';
+
 
 type ChatLog = {
   key: string;
@@ -35,12 +42,12 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
     // 利用中のユーザーののユーザーネームを取得
     const {user} = useAuthContext(); 
     
-    const userName = user?.displayName||"";
-
+    // const userName = user?.displayName||"";
+    const userName = "佐藤次郎"
     // userとmyNameの並びを一意にすることでchatRoomの名前を特定
     const sortNameArray = sortName(partnerName,userName);
     const chatRoomName = sortNameArray[0] + "_" + sortNameArray[1];
-    
+
     // チャットルーム名
     let chatRef = collection(db, 'chatroom',chatRoomName, 'messages');
 
@@ -99,49 +106,76 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
     }}, []);
 
     return (
-        <>
-        {/* チャットログ */}
-        <div>
-            {chatLogs.map((item) => (
-            <div
-                className={`balloon_${userName === item.name ? 'r' : 'l'}`}
-                key={item.key}
-            >
-                {userName === item.name ? `[${formatHHMM(item.date)}]` : ''}
-                <div className="faceicon">
-                
+        <div id='wrapper_chatLog'>
+            {/* チャットログ */}
+            <div id='outer_chatLogView'>
+                {chatLogs.map((item) => (
+                <div
+                    className={`balloon_${userName === item.name ? 'r' : 'l'}`}
+                    key={item.key}
+                >
+                    {userName === item.name ? `[${formatHHMM(item.date)}]` : ''}
+                    <div className="faceicon">
+                    
+                    </div>
+                    <div style={{ marginLeft: '3px' }}>
+                    {item.name}
+                    <p className="says">{item.msg}</p>
+                    </div>
+                    {userName === item.name ? '' : `[${formatHHMM(item.date)}]`}
                 </div>
-                <div style={{ marginLeft: '3px' }}>
-                {item.name}
-                <p className="says">{item.msg}</p>
-                </div>
-                {userName === item.name ? '' : `[${formatHHMM(item.date)}]`}
+                ))}
             </div>
-            ))}
+            
+            {/* メッセージ入力 コンポーネント化する*/}
+            <div className='inputform'>
+                <form
+                    className="chatform_outer"
+                    onSubmit={async (e) => {
+                    e.preventDefault();
+                    await submitMsg();
+                    }}
+                > 
+                    <TextField
+                        id="text"
+                        type="text"
+                        value={inputMsg}
+                        onChange={(e) => setInputMsg(e.target.value)}
+                        fullWidth
+                            variant="outlined"
+                            sx={{
+                            backgroundColor: "white",
+                            '& .MuiInputBase-input': {
+                                height: '100%',
+                                padding: '10px', 
+                            },
+                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                borderColor: '#96C78C', // フォーカス時のボーダー色
+                            },
+                            '& .MuiFormHelperText-root': { // ここを修正
+                                margin: '0px', // マージンを0に設定
+                            },
+                        }}
+                        
+                    
+                        slotProps={{
+                            input: {
+                                endAdornment: (
+                                <InputAdornment position="end">
+                                    <IconButton
+                                        aria-label="send-message"
+                                        onClick={() => submitMsg}
+                                    >
+                                        <Send/>
+                                    </IconButton>
+                                </InputAdornment>
+                                ),
+                            },
+                            }}           
+                        />
+                </form>
+            </div>
         </div>
-        
-        {/* メッセージ入力 コンポーネント化する*/}
-        <form
-            className="chatform"
-            onSubmit={async (e) => {
-            e.preventDefault();
-            await submitMsg();
-            }}
-        >
-            <div>{userName}</div>
-            <input
-            type="text"
-            value={inputMsg}
-            onChange={(e) => setInputMsg(e.target.value)}
-            />
-            <input
-            type="image"
-            onClick={() => submitMsg}
-            src="../img/airplane.png"
-            alt="Send Button"
-            />
-        </form>
-        </>
     );
 };
 
