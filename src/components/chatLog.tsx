@@ -33,8 +33,9 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
     
     // 利用中のユーザーののユーザーネームを取得
     const {user} = useAuthContext(); 
+
     const userName = user?.displayName;
-    
+
     // userとmyNameの並びを一意にする関数
     const chatRoomName = partnerName + "_" + userName
     
@@ -61,17 +62,19 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
         if (!message) {
         return;
         }
-
-        await addDoc(chatRef, {
-        name: userName,
-        msg: message,
-        date: new Date().getTime(),
-        });
+        if(user){ //ログインしていれば
+            await addDoc(chatRef, {
+                name: userName,
+                msg: message,
+                date: new Date().getTime(),
+            });
+        }
 
         setInputMsg('');
     };
 
     useEffect(() => {
+        if(user){ //ログインしていれば
         // 最新10件取得。本番では50件まで増やす
         const q = query(chatRef, orderBy('date', 'desc'), limit(10));
         // データ同期(講読解除(cleanup)のためreturn)
@@ -91,7 +94,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
         });
         });
 
-    }, []);
+    }}, []);
 
     return (
         <>
