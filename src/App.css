@@ -1,8 +1,8 @@
-/* アプリ全体のスタイル */
+
 .App {
     text-align: center;
-    background-color: #f0f0f0; /* 背景色を明るく */
-    font-family: Arial, sans-serif; /* フォントの変更 */
+    background-color: #f0f0f0; 
+    font-family: Arial, sans-serif; 
 }
 
 
@@ -42,54 +42,54 @@
 }
 
 
-/* チャットリストのスタイル */
+
 .chat-list {
-    list-style-type: none; /* デフォルトのドットを消す */
-    padding: 0; /* パディングをゼロに */
-    margin: 0; /* マージンをゼロに */
-    border: 1px solid #ccc; /* 線で囲む */
-    border-radius: 12px; /* 角を丸くする */
+    list-style-type: none; 
+    padding: 0; 
+    margin: 0; 
+    border: 1px solid #ccc; 
+    border-radius: 12px; 
 }
 
-/* チャットアイテムのスタイル */
+
 .chat-item {
-    display: flex; /* Flexboxで配置 */
-    align-items: center; /* 縦方向を中央揃え */
-    padding: 10px 15px; /* アイテムのパディング */
-    border-bottom: 1px solid #eee; /* アイテムの下に線を引く */
-    transition: background-color 0.3s; /* 背景色のアニメーション */
+    display: flex; 
+    align-items: center; 
+    padding: 10px 15px; 
+    border-bottom: 1px solid #eee; 
+    transition: background-color 0.3s; 
 }
 
     .chat-item:last-child {
-        border-bottom: none; /* 最後のアイテムには線を引かない */
+        border-bottom: none; 
     }
 
     .chat-item:hover {
-        background-color: #f9f9f9; /* ホバー時の背景色 */
+        background-color: #f9f9f9;
     }
 
-/* ユーザー画像のスタイル */
+
 .user-image {
-    border-radius: 50%; /* 画像を丸くする */
-    height: 50px; /* 画像のサイズ */
-    width: 50px; /* 画像のサイズ */
-    margin-right: 15px; /* 右マージン */
+    border-radius: 50%; 
+    height: 50px; 
+    width: 50px; 
+    margin-right: 15px; 
 }
 
-/* チャット詳細のスタイル */
+
 .chat-details {
-    flex-grow: 1; /* 残りのスペースを埋める */
+    flex-grow: 1; 
 }
 
-/* タイムスタンプのスタイル */
+
 .timestamp {
-    margin-left: auto; /* 左側を押し出して右端に配置 */
-    color: gray; /* 色を薄くする */
+    margin-left: auto; 
+    color: gray; 
 }
 
-/* 最新のメッセージのスタイル */
+
 .last-message {
-    color: #666; /* メッセージの色を薄く */
-    font-size: 0.9em; /* フォントサイズを小さく */
+    color: #666; 
+    font-size: 0.9em; 
 }
 
