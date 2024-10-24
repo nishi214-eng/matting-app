@@ -1,51 +1,94 @@
-/* �`���b�g���X�g�̃X�^�C�� */
-.chat-list {
-    list-style-type: none; /* �f�t�H���g�̃h�b�g������ */
-    padding: 0; /* �p�f�B���O���[���� */
-    margin: 0; /* �}�[�W�����[���� */
-    border: 1px solid #ccc; /* ���ň͂� */
-    border-radius: 12px; /* �p���ۂ����� */
+.App {
+    text-align: center;
+    background-color: #f0f0f0; 
+    font-family: Arial, sans-serif; 
 }
 
-/* �`���b�g�A�C�e���̃X�^�C�� */
+
+.App-logo {
+  height: 40vmin;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .App-logo {
+    animation: App-logo-spin infinite 20s linear;
+  }
+}
+
+.App-header {
+  background-color: #282c34;
+  min-height: 1vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-size: calc(10px + 2vmin);
+  color: white;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+
+
+.chat-list {
+    list-style-type: none; 
+    padding: 0; 
+    margin: 0; 
+    border: 1px solid #ccc; 
+    border-radius: 12px; 
+}
+
+
 .chat-item {
-    display: flex; /* Flexbox�Ŕz�u */
-    align-items: center; /* �c�����𒆉����� */
-    padding: 10px 15px; /* �A�C�e���̃p�f�B���O */
-    border-bottom: 1px solid #eee; /* �A�C�e���̉��ɐ������� */
-    transition: background-color 0.3s; /* �w�i�F�̃A�j���[�V���� */
+    display: flex; 
+    align-items: center; 
+    padding: 10px 15px; 
+    border-bottom: 1px solid #eee; 
+    transition: background-color 0.3s; 
 }
 
     .chat-item:last-child {
-        border-bottom: none; /* �Ō�̃A�C�e���ɂ͐��������Ȃ� */
+        border-bottom: none; 
     }
 
     .chat-item:hover {
-        background-color: #f9f9f9; /* �z�o�[���̔w�i�F */
+        background-color: #f9f9f9;
     }
 
-/* ���[�U�[�摜�̃X�^�C�� */
+
 .user-image {
-    border-radius: 50%; /* �摜���ۂ����� */
-    height: 50px; /* �摜�̃T�C�Y */
-    width: 50px; /* �摜�̃T�C�Y */
-    margin-right: 15px; /* �E�}�[�W�� */
+    border-radius: 50%; 
+    height: 50px; 
+    width: 50px; 
+    margin-right: 15px; 
 }
 
-/* �`���b�g�ڍׂ̃X�^�C�� */
+
 .chat-details {
-    flex-grow: 1; /* �c��̃X�y�[�X�𖄂߂� */
+    flex-grow: 1; 
 }
 
-/* �^�C���X�^���v�̃X�^�C�� */
+
 .timestamp {
-    margin-left: auto; /* �����������o���ĉE�[�ɔz�u */
-    color: gray; /* �F�𔖂����� */
+    margin-left: auto; 
+    color: gray; 
 }
 
-/* �ŐV�̃��b�Z�[�W�̃X�^�C�� */
+
 .last-message {
-    color: #666; /* ���b�Z�[�W�̐F�𔖂� */
-    font-size: 0.9em; /* �t�H���g�T�C�Y�������� */
+    color: #666; 
+    font-size: 0.9em; 
 }
 
