@@ -5,7 +5,7 @@ import { auth } from "../infra/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
 import { TextField, Button } from "@mui/material";
 import { signOut } from "firebase/auth";
-import { Link, Navigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
 import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
