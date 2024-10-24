@@ -93,12 +93,6 @@ export const FileUploadForm: React.FC = () => {
                 <a href={downloadURL} target="_blank" rel="noopener noreferrer">{downloadURL}</a>
               </div>
             )}
-
-            <div className="linkItem">
-              <ul>
-                <li><Link to="/">ログイン</Link></li>
-              </ul>
-            </div>
           </form>
         </div>
       </section>
