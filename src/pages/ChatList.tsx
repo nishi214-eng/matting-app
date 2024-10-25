@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
-import { db } from "../infra/firebase";
+import { db } from "./infra/firebase";
 
 // チャットインターフェースに必要なプロパティを定義
 interface Chat {
