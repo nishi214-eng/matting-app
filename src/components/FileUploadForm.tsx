@@ -1,26 +1,29 @@
 // components/FileUploadForm.tsx
-//         <Route path="/" element={<Navigate to="/FileUploadForm" />} />  {/* デフォルトルート */}<Route path="/FileUploadForm" element={<FileUploadForm />} /> 
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
 import { uploadFile } from '../feature/uploadFile'; // ファイルアップロードの機能をインポート
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
-import { Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // useNavigateフックをインポート
 import "../style/auth.css";
 
-interface FileUploadForm {
+interface FileUploadFormProps {
+  onFailure?: () => void; // エラー時のコールバックプロパティを追加
+}
+
+interface FileUploadFormData {
   file: FileList;
 }
 
-export const FileUploadForm: React.FC = () => {
+export const FileUploadForm: React.FC<FileUploadFormProps> = ({ onFailure }) => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
-  const [redirect, setRedirect] = useState<boolean>(false);
+  const navigate = useNavigate(); // useNavigateの初期化
 
   // React Hook Formの使用
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FileUploadForm>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FileUploadFormData>();
 
   // フォームの送信処理
-  const onSubmit: SubmitHandler<FileUploadForm> = async (data) => {
+  const onSubmit: SubmitHandler<FileUploadFormData> = async (data) => {
     const file = data.file[0];
     if (!file) return;
 
@@ -28,19 +31,15 @@ export const FileUploadForm: React.FC = () => {
     try {
       const url = await uploadFile(file); // features/uploadFile.tsの関数を使用
       setDownloadURL(url);
-      setRedirect(true); // アップロード成功時にリダイレクトフラグをセット
       reset();
+      navigate(-1); // アップロード成功時に前の画面に戻る
     } catch (error) {
       console.error('ファイルアップロードエラー:', error);
+      if (onFailure) onFailure(); // エラー時に親コンポーネントのコールバックを呼び出す
     } finally {
       setUploading(false);
     }
   };
-
-  // リダイレクト処理
-  if (redirect) {
-    return <Navigate to="/success" />; // 成功ページへリダイレクト
-  }
 
   return (
     <div className="form_container">
@@ -87,12 +86,11 @@ export const FileUploadForm: React.FC = () => {
               </Button>
             </div>
 
-            {downloadURL && (
-              <div className="linkItem">
-                <Typography variant="body1">アップロードされたファイルのURL:</Typography>
-                <a href={downloadURL} target="_blank" rel="noopener noreferrer">{downloadURL}</a>
+            {
+              <div className="Item">
+                <Typography variant="body1">アップロードは成功しました</Typography>
               </div>
-            )}
+            }
           </form>
         </div>
       </section>
