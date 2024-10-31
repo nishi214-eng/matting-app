@@ -9,6 +9,7 @@ import ProfileForm from './pages/ProfileForm';
 import Chat from './pages/Chat';
 import { AuthProvider } from './store/AuthContext';
 import { AlertProvider } from './store/useSnackber';
+import { FileUploadForm } from './components/FileUploadForm';
 
 function App() {
   return (
@@ -19,7 +20,7 @@ function App() {
         <AuthProvider>
           <AlertProvider>
             <Routes>
-              <Route path="/" element={<SignIn />} />
+              <Route path="/" element={<FileUploadForm uploadType="license" />} />
               <Route path="/SignUp" element={<SignUp />} />
               <Route path="/ResetPassword" element={<ResetPassword />} />
               <Route path="/ChatList" element={<ChatList />} />
