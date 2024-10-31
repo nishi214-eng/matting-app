@@ -1,4 +1,6 @@
 // features/uploadFile.ts
+//userIdとuploadTypeで識別する
+
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { storage } from '../infra/firebase';
 import { v4 as uuidv4 } from 'uuid';
