@@ -9,6 +9,7 @@ import ProfileForm from './pages/ProfileForm';
 import Chat from './pages/Chat';
 import { AuthProvider } from './store/AuthContext';
 import { AlertProvider } from './store/useSnackber';
+import { FileUploadForm } from './components/FileUploadForm';
 
 function App() {
   return (
