@@ -1,46 +1,57 @@
 // components/FileUploadForm.tsx
-//         <Route path="/" element={<Navigate to="/FileUploadForm" />} />  {/* デフォルトルート */}<Route path="/FileUploadForm" element={<FileUploadForm />} /> 
+
+/*コンポネント使うとき
+<FileUploadForm uploadType="license" />
+<FileUploadForm uploadType="icon" />
+<FileUploadForm uploadType="profile" />*/
+
 import React, { useState } from 'react';
 import { useForm, SubmitHandler } from 'react-hook-form';
+import { useAuthContext } from '../store/AuthContext';
 import { uploadFile } from '../feature/uploadFile'; // ファイルアップロードの機能をインポート
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
-import { Link, Navigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom'; // useNavigateフックをインポート
 import "../style/auth.css";
 
-interface FileUploadForm {
+interface FileUploadFormProps {
+  onFailure?: () => void; // エラー時のコールバックプロパティを追加
+  uploadType: 'license' | 'icon' | 'profile'; // アップロードタイプを追加
+}
+
+interface FileUploadFormData {
   file: FileList;
 }
 
-export const FileUploadForm: React.FC = () => {
+export const FileUploadForm: React.FC<FileUploadFormProps> = ({ onFailure, uploadType }) => {
   const [uploading, setUploading] = useState<boolean>(false);
   const [downloadURL, setDownloadURL] = useState<string | null>(null);
-  const [redirect, setRedirect] = useState<boolean>(false);
+  const navigate = useNavigate(); // useNavigateの初期化
 
   // React Hook Formの使用
-  const { register, handleSubmit, formState: { errors }, reset } = useForm<FileUploadForm>();
+  const { register, handleSubmit, formState: { errors }, reset } = useForm<FileUploadFormData>();
+
+  // 認証ユーザーのIDを取得
+  const { user } = useAuthContext(); 
+  const userId = user?.uid; // ユーザーIDを取得
 
   // フォームの送信処理
-  const onSubmit: SubmitHandler<FileUploadForm> = async (data) => {
+  const onSubmit: SubmitHandler<FileUploadFormData> = async (data) => {
     const file = data.file[0];
-    if (!file) return;
+    if (!file || !userId) return;
 
     setUploading(true);
     try {
-      const url = await uploadFile(file); // features/uploadFile.tsの関数を使用
+      const url = await uploadFile(file, userId, uploadType); // uploadType をアップロード関数に渡す
       setDownloadURL(url);
-      setRedirect(true); // アップロード成功時にリダイレクトフラグをセット
       reset();
+      navigate(-1); // アップロード成功時に前の画面に戻る
     } catch (error) {
       console.error('ファイルアップロードエラー:', error);
+      if (onFailure) onFailure(); // エラー時に親コンポーネントのコールバックを呼び出す
     } finally {
       setUploading(false);
     }
   };
-
-  // リダイレクト処理
-  if (redirect) {
-    return <Navigate to="/success" />; // 成功ページへリダイレクト
-  }
 
   return (
     <div className="form_container">
@@ -49,14 +60,18 @@ export const FileUploadForm: React.FC = () => {
           <form onSubmit={handleSubmit(onSubmit)} aria-label="ファイルアップロードフォーム">
             <fieldset className="input_section">
               <div className="input_subsection">
-                <label htmlFor="file" className="subsection_title">アップロードするファイル</label>
+                <label htmlFor="file" className="subsection_title">
+                  {uploadType === 'license' && '免許書のアップロード'}
+                  {uploadType === 'icon' && 'アイコンのアップロード'}
+                  {uploadType === 'profile' && 'プロフィールのアップロード'}
+                </label>
                 <div className="text_field">
                   <TextField
                     id="file"
                     type="file"
                     fullWidth
                     variant="outlined"
-                    inputProps={{ accept: 'image/*' }}
+                    inputProps={{ accept: uploadType === 'license' ? 'image/*' : uploadType === 'icon' ? 'image/png,image/jpeg' : 'image/*' }} // アップロードするファイルの種類を指定
                     sx={{
                       backgroundColor: 'white',
                       '& .MuiInputBase-input': { height: '100%', padding: '10px', border: '0px' },
@@ -79,7 +94,7 @@ export const FileUploadForm: React.FC = () => {
                   borderRadius: '1%',
                   backgroundColor: '#96C78C',
                   boxShadow: 'none',
-                  '&:hover': { backgroundColor: '98C78C' },
+                  '&:hover': { backgroundColor: '#98C78C' },
                 }}
                 disabled={uploading}
               >
@@ -87,10 +102,9 @@ export const FileUploadForm: React.FC = () => {
               </Button>
             </div>
 
-            {downloadURL && (
-              <div className="linkItem">
-                <Typography variant="body1">アップロードされたファイルのURL:</Typography>
-                <a href={downloadURL} target="_blank" rel="noopener noreferrer">{downloadURL}</a>
+            {downloadURL && ( // downloadURLが存在する場合にのみ表示
+              <div className="Item">
+                <Typography variant="body1">アップロードは成功しました</Typography>
               </div>
             )}
           </form>
