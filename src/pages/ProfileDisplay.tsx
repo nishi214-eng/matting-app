@@ -2,14 +2,16 @@ import React, { useState, useEffect } from "react";
 import { db } from "../infra/firebase";
 import { collection, getDoc } from "firebase/firestore";
 import { ref, getStorage, getDownloadURL} from "firebase/storage";
+import { Link } from "react-router-dom";
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
-    nickName: string;
-    age: number;
-    userImage: string;
-    origin: string;
-    hobby: string;
+  id : string | null | undefined;
+  nickName: string;
+  age: number;
+  userImage: string | null;
+  origin: string;
+  hobby: string;
 };
 
 const ProfileDisplay: React.FC = () => {
@@ -32,16 +34,24 @@ const ProfileDisplay: React.FC = () => {
     //一気に書き上げるため、ニックネームだけ配置。写真の問題を解決したら書く。
     //プロフィールっぽくするためにMUIでよさげなやつを選ぶかCSSを考える。
     return(
-        <div>
-        <h1>自分のプロフィール(仮)</h1>
-        <ul>
-        {profiles.map((profile, index) => (
-          <li key={index}>
-            <p>{profile.nickName}</p>
-          </li>
-        ))}
-        </ul>
+      <div>
+          <div>
+          <h1>自分のプロフィール(仮)</h1>
+          <ul>
+          {profiles.map((profile, index) => (
+            <li key={index}>
+              <p>{profile.nickName}</p>
+            </li>
+          ))}
+          </ul>
+        </div>
+        <div className="linkItem">
+          <Link to={"/ProfileForm"} >
+              プロフィール更新
+          </Link>
+        </div>
       </div>
+        
     );
 };
 
