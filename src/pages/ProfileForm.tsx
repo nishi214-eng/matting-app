@@ -1,56 +1,62 @@
 import React, { useState } from "react";
-import { db, storage } from "../infra/firebase";
+import { db } from "../infra/firebase";
 import { collection, addDoc } from "firebase/firestore";
-import { ref, getStorage, uploadBytes, getDownloadURL} from "firebase/storage";
+import {uploadFile} from "../feature/uploadFile";
+import { useAuthContext } from '../store/AuthContext';
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
+    id : string | null | undefined;
     nickName: string;
     age: number;
-    userImage: string;
+    userImage: string | null;
     origin: string;
     hobby: string;
 };
+const {user} = useAuthContext(); 
 
 const ProfileForm: React.FC = () => {
-    //入力されているプロフィールのデータ,入力で変化があると画面を再レンダリングする
+    //プロフィール
     const [profile, setProfile] = useState<Profile>
-    ({nickName: "", age: 0, userImage: "", 
+    ({id: "", nickName: "", age: 0, userImage: "", 
         origin: "", hobby: "" });
-    //アイコンイメージ
-    const [image, setImage] = useState<File | null>(null);
-    //ストレージにぶち込んだイメージのURL
-    const [url, setUrl] = useState<string | null>(null);
+
+    
+    const [image, setImage] = useState<File | null>(null);//アイコンイメージ
+    const [imageUrl, setImageUrl] = useState<string | null>(null);//仮置き、入力されたアイコン画像
 
     //フォームに入力があると、入力内容を取得
     const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setProfile({...profile, [name] : value});
-        //イメージの変更なら
-        /*
+    };
+    //フォームにイメージの入力があった場合
+    const handleSetImage = (e : React.ChangeEvent<HTMLInputElement>) => {
         if(e.target.files){
-            setImage(e.target.files);
+            setImage(e.target.files[0]);
+            const url = URL.createObjectURL(e.target.files[0]);
+            setImageUrl(url);//入力イメージの表示
         }
-        */
+    };
+    //入力イメージのリセット
+    const handleReset =() => {
+        setImage(null);
+        setImageUrl(null);
     };
 
     //送信ボタンを押した時の処理
     const handleSubmit = async (e : React.FormEvent ) => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
         try {
-            //addDoc には await 必要。
+            //イメージのアップロードがあるなら
+            if(image){
+                const url = await uploadFile(image, user?.email, profile); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url);
+                setProfile({...profile, userImage : url});//結果のURLをプロフィールに追加
+            }
+            setProfile({...profile, id : user?.email});
             await addDoc(collection( db, "profiles" ), profile);    //firebaseのFireStoreにプロフィールをぶちこむ
             console.log('Profile saved successfully');
-            //イメージのアップロードがあるなら
-            /*
-            if(image){
-                const storageRef = ref(storage, 'images/${image.name}');
-                await uploadBytes(storageRef, image);
-                const downloadURL = await getDownloadURL(storageRef);
-                setUrl(downloadURL);
-                console.log('Image uploaded successfully:', downloadURL);
-            }
-            */
         } catch(error){
             console.error('Error saving Profile: ', error);
         }
@@ -66,6 +72,17 @@ const ProfileForm: React.FC = () => {
             <div>
                 <label>Age:
                     <input type="number" name="age" value={profile.age} onChange={handleChange} />
+                </label>
+            </div>
+            <div>
+                <label>userImage:
+                <input type="file" onChange={handleSetImage} />
+                    {imageUrl && (
+                        <div>
+                            <img src={imageUrl} alt="selected" style={{ height: '300px', width: '300px' }} />
+                            <button onClick={handleReset}>Reset</button>
+                        </div>
+                    )}
                 </label>
             </div>
             <div>
