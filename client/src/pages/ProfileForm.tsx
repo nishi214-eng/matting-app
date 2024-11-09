@@ -13,13 +13,14 @@ interface Profile {
     origin: string;
     hobby: string;
 };
-const {user} = useAuthContext(); 
 
 const ProfileForm: React.FC = () => {
     //プロフィール
     const [profile, setProfile] = useState<Profile>
     ({id: "", nickName: "", age: 0, userImage: "", 
         origin: "", hobby: "" });
+    const {user} = useAuthContext(); 
+
 
     
     const [image, setImage] = useState<File | null>(null);//アイコンイメージ
