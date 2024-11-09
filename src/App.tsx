@@ -19,10 +19,8 @@ function App() {
         <AuthProvider>
           <AlertProvider>
             <Routes>
-              <Route path="/" element={<SignIn />} />
-              <Route path="/SignUp" element={<SignUp />} />
-              <Route path="/ResetPassword" element={<ResetPassword />} />
-              <Route path="/ChatList" element={<ChatList />} />
+
+              <Route path="/" element={<ChatList />} />
               <Route path="/Chat" element={<Chat/>} />
               <Route path="/ProfileForm" element={<ProfileForm />} />
               <Route path="*" element={<h1>Not Found Page</h1>} />
