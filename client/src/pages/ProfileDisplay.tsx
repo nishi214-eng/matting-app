@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { db } from "../infra/firebase";
-import { collection, getDoc } from "firebase/firestore";
+import { collection, getDocs } from "firebase/firestore";
 import { ref, getStorage, getDownloadURL} from "firebase/storage";
 import { Link } from "react-router-dom";
 
@@ -23,7 +23,7 @@ const ProfileDisplay: React.FC = () => {
     useEffect(() => {
         const fetchProfiles = async () => {
           const profilesCollection = collection(db, 'profiles');
-          const profileSnapshot = await getDoc(profilesCollection);
+          const profileSnapshot = await getDocs(profilesCollection);
           const profileList = profileSnapshot.docs.map(doc => doc.data() as Profile);
           setProfiles(profileList);
         };

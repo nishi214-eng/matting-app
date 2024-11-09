@@ -50,7 +50,7 @@ const ProfileForm: React.FC = () => {
         try {
             //イメージのアップロードがあるなら
             if(image){
-                const url = await uploadFile(image, user?.email, profile); // features/uploadFile.tsの関数を使用
+                const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
                 console.log('Image uploaded successfully:', url);
                 setProfile({...profile, userImage : url});//結果のURLをプロフィールに追加
             }
