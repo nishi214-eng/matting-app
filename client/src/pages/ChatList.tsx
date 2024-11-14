@@ -105,7 +105,7 @@ function ChatList() {
                 <Button variant="contained" color="primary" onClick={() => navigate("/home")}>
                     ホーム
                 </Button>
-                <Button variant="contained" color="primary" onClick={() => navigate("/profile")}>
+                <Button variant="contained" color="primary" onClick={() => navigate("/ProfileDisplay")}>
                     プロフィール画面
                 </Button>
             </Box>

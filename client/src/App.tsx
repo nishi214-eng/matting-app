@@ -6,6 +6,7 @@ import { BrowserRouter, Route, Routes} from "react-router-dom";
 import './App.css';
 import ChatList from './pages/ChatList';
 import ProfileForm from './pages/ProfileForm';
+import ProfileDisplay from './pages/ProfileDisplay';
 import Chat from './pages/Chat';
 import { AuthProvider } from './store/AuthContext';
 import { AlertProvider } from './store/useSnackber';
@@ -25,6 +26,7 @@ function App() {
               <Route path="/ChatList" element={<ChatList />} />
               <Route path="/Chat" element={<Chat/>} />
               <Route path="/ProfileForm" element={<ProfileForm />} />
+              <Route path="/ProfileDisplay" element={<ProfileDisplay />} />
               <Route path="*" element={<h1>Not Found Page</h1>} />
             </Routes>
           </AlertProvider>
