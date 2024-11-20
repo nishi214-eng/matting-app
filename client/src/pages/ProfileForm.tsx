@@ -10,6 +10,7 @@ interface Profile {
     nickName: string;
     age: number;
     userImage: string | null;
+    userImage2: string | null;
     origin: string;
     hobby: string;
 };
@@ -17,14 +18,16 @@ interface Profile {
 const ProfileForm: React.FC = () => {
     //プロフィール
     const [profile, setProfile] = useState<Profile>
-    ({id: "", nickName: "", age: 0, userImage: "", 
+    ({id: "", nickName: "", age: 0, userImage: "", userImage2: "",
         origin: "", hobby: "" });
     const {user} = useAuthContext(); 
 
 
     
     const [image, setImage] = useState<File | null>(null);//アイコンイメージ
+    const [image2, setImage2] = useState<File | null>(null);//アイコンイメージ
     const [imageUrl, setImageUrl] = useState<string | null>(null);//仮置き、入力されたアイコン画像
+    const [imageUrl2, setImageUrl2] = useState<string | null>(null);//仮置き、入力されたアイコン画像
 
     //フォームに入力があると、入力内容を取得
     const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
@@ -39,10 +42,25 @@ const ProfileForm: React.FC = () => {
             setImageUrl(url);//入力イメージの表示
         }
     };
+    //フォームにイメージの入力があった場合・その2
+    const handleSetImage2 = (e : React.ChangeEvent<HTMLInputElement>) => {
+        if(e.target.files){
+            setImage2(e.target.files[0]);
+            const url = URL.createObjectURL(e.target.files[0]);
+            setImageUrl2(url);//入力イメージの表示
+        }
+    };
+
+
     //入力イメージのリセット
     const handleReset =() => {
         setImage(null);
         setImageUrl(null);
+    };
+    //入力イメージのリセット・その2
+    const handleReset2 =() => {
+        setImage2(null);
+        setImageUrl2(null);
     };
 
     //送信ボタンを押した時の処理
@@ -54,6 +72,11 @@ const ProfileForm: React.FC = () => {
                 const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
                 console.log('Image uploaded successfully:', url);
                 setProfile({...profile, userImage : url});//結果のURLをプロフィールに追加
+            }
+            if(image2){
+                const url = await uploadFile(image2, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url);
+                setProfile({...profile, userImage2 : url});//結果のURLをプロフィールに追加
             }
             setProfile({...profile, id : user?.email});
             await addDoc(collection( db, "profiles" ), profile);    //firebaseのFireStoreにプロフィールをぶちこむ
@@ -82,6 +105,17 @@ const ProfileForm: React.FC = () => {
                         <div>
                             <img src={imageUrl} alt="selected" style={{ height: '300px', width: '300px' }} />
                             <button onClick={handleReset}>Reset</button>
+                        </div>
+                    )}
+                </label>
+            </div>
+            <div>
+                <label>userImage2:
+                <input type="file" onChange={handleSetImage2} />
+                    {imageUrl2 && (
+                        <div>
+                            <img src={imageUrl2} alt="selected" style={{ height: '300px', width: '300px' }} />
+                            <button onClick={handleReset2}>Reset</button>
                         </div>
                     )}
                 </label>
