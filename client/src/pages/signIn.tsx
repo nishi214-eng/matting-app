@@ -1,5 +1,5 @@
 import { useForm, SubmitHandler } from "react-hook-form"
-
+import { useNavigate } from 'react-router-dom'; // useNavigateフックをインポート
 import { useEffect,useState } from "react";
 import { auth } from "../infra/firebase";
 import { signInWithEmailAndPassword } from "firebase/auth";
@@ -21,7 +21,7 @@ interface SigninForm {
 
 export const SignIn = () => {
     //const { showAlert } = useContext(AlertContext);
-  
+    const navigate = useNavigate();
     // React Hook Formの使用
     const { register, handleSubmit, formState: { errors } } = useForm<SigninForm>(); // useForm関数をLoginForm型で呼び出す
   
@@ -37,7 +37,7 @@ export const SignIn = () => {
         // サインインの実行
         await signInWithEmailAndPassword(auth, email, password);
         // 次ページに遷移  
-        // Navigate("../Home")
+        navigate("/ChatList")
 
       } catch {
         // エラー処理
