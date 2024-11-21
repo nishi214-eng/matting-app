@@ -1,27 +1,20 @@
-// ChatList.tsx
-
 import { useEffect, useState } from "react";
 import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { db } from "../infra/firebase";
 import { useNavigate } from "react-router-dom";
-
-// Material-UIのコンポーネントをインポート
 import {
     Avatar,
     Button,
     List,
     ListItem,
-    ListItemAvatar,
-    ListItemText,
     Typography,
     CircularProgress,
     Box,
 } from "@mui/material";
 
-// チャットインターフェースに必要なプロパティを定義
 interface Chat {
     id: string;
-    userName: string;
+    name: string;
     lastMessage: string;
     timestamp: number;
     userImage: string;
@@ -38,20 +31,28 @@ function ChatList() {
     useEffect(() => {
         const fetchChats = async () => {
             try {
-                const querySnapshot = await getDocs(collection(db, "chats"));
-                const chatData = querySnapshot.docs.map(
-                    (doc: QueryDocumentSnapshot<DocumentData>): Chat => ({
-                        id: doc.id,
-                        userName: doc.data().userName,
-                        lastMessage: doc.data().lastMessage,
-                        timestamp: doc.data().timestamp,
-                        userImage: doc.data().userImage,
-                        age: doc.data().age,
-                        origin: doc.data().origin,
+                const querySnapshot1 = await getDocs(collection(db, "chatroom"));
+                const chatData = await Promise.all(
+                    querySnapshot1.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
+                        const chatRef = collection(db, `chatroom/${doc.id}/userIdList`);
+                        const userDocs = await getDocs(chatRef);
+
+                        return userDocs.docs.map((userDoc) => {
+                            const data = userDoc.data();
+                            return {
+                                id: userDoc.id, // userIdを保存
+                                name: data.name || "名前未設定", // デフォルト値
+                                lastMessage: data.lastMessage || "メッセージなし",
+                                timestamp: data.timestamp?.seconds || 0, // Firestore Timestamp を変換
+                                userImage: data.userImage || "",
+                                age: data.age || 0, // デフォルト値
+                                origin: data.origin || "出身地不明",
+                            };
+                        });
                     })
                 );
 
-                setChats(chatData);
+                setChats(chatData.flat());
             } catch (err) {
                 console.error("Error fetching chats:", err);
                 setError("チャットの取得に失敗しました。");
@@ -76,37 +77,83 @@ function ChatList() {
     }
 
     return (
-        <Box p={2}>
-            <Typography variant="h5" gutterBottom>トーク</Typography>
+        <Box
+            sx={{
+                maxWidth: "600px",
+                margin: "0 auto",
+                padding: "16px",
+                backgroundColor: "#f7f7f7",
+                borderRadius: "16px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+        >
+            <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                    textAlign: "center",
+                    marginBottom: "16px",
+                    fontWeight: "bold",
+                    color: "#333",
+                }}
+            >
+                トーク一覧
+            </Typography>
             <List>
                 {chats.map((chat) => (
-                    <ListItem key={chat.id} alignItems="flex-start">
-                        <ListItemAvatar>
-                            <Avatar alt={chat.userName} src={chat.userImage} />
-                        </ListItemAvatar>
-                        <ListItemText
-                            primary={`${chat.userName} ${chat.age}歳 ${chat.origin}`}
-                            secondary={
-                                <>
-                                    <Typography component="span" variant="body2" color="textPrimary">
-                                        {chat.lastMessage}
-                                    </Typography>
-                                    <br />
-                                    <Typography variant="caption" color="textSecondary">
-                                        {new Date(chat.timestamp * 1000).toLocaleString()}
-                                    </Typography>
-                                </>
-                            }
-                        />
+                    <ListItem
+                        key={chat.id}
+                        alignItems="flex-start"
+                        onClick={() => navigate(`/chat/${chat.id}`)}
+                        sx={{
+                            borderRadius: "8px",
+                            "&:hover": {
+                                backgroundColor: "#f9f9f9",
+                                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+                            },
+                        }}
+                    >
+                        <Avatar alt={chat.name} src={chat.userImage} />
+                        <Box sx={{ marginLeft: 2 }}>
+                            <Typography variant="body1">
+                                {chat.name}（{chat.age}歳） - {chat.origin}
+                            </Typography>
+                            <Typography variant="caption">
+                                {new Date(chat.timestamp * 1000).toLocaleString()}
+                            </Typography>
+                            <Typography>
+                                {chat.lastMessage}
+                            </Typography>
+                        </Box>
                     </ListItem>
                 ))}
             </List>
-            <Box mt={2} display="flex" justifyContent="center">
-                <Button variant="contained" color="primary" onClick={() => navigate("/home")}>
+            <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: "#96C78C",
+                        color: "#fff",
+                        "&:hover": {
+                            backgroundColor: "#88b078",
+                        },
+                    }}
+                    onClick={() => navigate("/home")}
+                >
                     ホーム
                 </Button>
-                <Button variant="contained" color="primary" onClick={() => navigate("/ProfileDisplay")}>
-                    プロフィール画面
+                <Button
+                    variant="contained"
+                    sx={{
+                        backgroundColor: "#96C78C",
+                        color: "#fff",
+                        "&:hover": {
+                            backgroundColor: "#88b078",
+                        },
+                    }}
+                    onClick={() => navigate("/ProfileDisplay")}
+                >
+                    プロフィール
                 </Button>
             </Box>
         </Box>
