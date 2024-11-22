@@ -3,6 +3,7 @@ import { db } from "../infra/firebase";
 import { collection, addDoc } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
+import NaviButtons from '../components/NavigationButtons';
 import { Select } from "@mui/material";
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
@@ -265,7 +266,9 @@ const ProfileForm: React.FC = () => {
                 </label>
             </div>
             <button type = "submit">Submit</button>
+            <NaviButtons/>
         </form>
+   
     );
 };
 
