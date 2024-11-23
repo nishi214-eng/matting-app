@@ -103,22 +103,36 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
   }, []);
 
   return (
+
     <Box
       id="wrapper_chatLog"
       sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        backgroundColor: '#f9f9f9',
-        minHeight: '100vh',
-        padding: '20px',
+          maxWidth: "600px",
+          margin: "0 auto",
+          padding: "16px",
+          backgroundColor: "#f7f7f7",
+          borderRadius: "16px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
       }}
     >
+
+      <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+              textAlign: "center",
+              marginBottom: "16px",
+              fontWeight: "bold",
+              color: "#333",
+          }}
+      >
+        {userName}
+      </Typography>
       <Paper
         id="outer_chatLogView"
         sx={{
           width: '100%',
-          maxWidth: '600px',
+          maxWidth: '580px',
           padding: '10px',
           backgroundColor: '#ffffff',
           borderRadius: '8px',
@@ -203,11 +217,10 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
             },
           }}
         />
-        <NaviButtons/>
+            
       </form>
-      
+      <NaviButtons/>
     </Box>
-    
   );
 };
 

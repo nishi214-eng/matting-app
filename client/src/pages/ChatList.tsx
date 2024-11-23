@@ -5,14 +5,12 @@ import { useNavigate } from "react-router-dom";
 import NaviButtons from '../components/NavigationButtons';
 import {
     Avatar,
-    Button,
     List,
     ListItem,
     Typography,
     CircularProgress,
     Box,
 } from "@mui/material";
-import NavigationButtons from "../components/NavigationButtons";
 
 interface Chat {
     id: string;
