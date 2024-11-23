@@ -10,6 +10,7 @@ import ProfileDisplay from './pages/ProfileDisplay';
 import Chat from './pages/Chat';
 import { AuthProvider } from './store/AuthContext';
 import { AlertProvider } from './store/useSnackber';
+import VideoConnect from './pages/VideoConnect';
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
               <Route path="/Chat" element={<Chat/>} />
               <Route path="/ProfileForm" element={<ProfileForm />} />
               <Route path="/ProfileDisplay" element={<ProfileDisplay />} />
+              <Route path="/Tel" element={<VideoConnect />} />
               <Route path="*" element={<h1>Not Found Page</h1>} />
             </Routes>
           </AlertProvider>
