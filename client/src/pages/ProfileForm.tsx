@@ -4,6 +4,7 @@ import { collection, addDoc } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
 import { Select } from "@mui/material";
+import { updateProfile } from "firebase/auth";
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
@@ -107,6 +108,18 @@ const ProfileForm: React.FC = () => {
     const handleSubmit = async (e : React.FormEvent ) => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
         try {
+            // display nameを更新
+            if(user){
+                await updateProfile(user, {
+                    displayName:profile.nickName, // 新しいユーザーネーム
+                }).then(() => {
+                console.log("Display name updated successfully!");
+                }).catch((error) => {
+                console.error("Error updating display name:", error);
+                });
+            } else {
+                console.log("No user is signed in.");
+            }
             //イメージのアップロードがあるなら
             if(image){
                 const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
