@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../infra/firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { doc, collection, setDoc, getDoc } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
@@ -10,7 +10,6 @@ import { updateProfile } from "firebase/auth";
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
-    id : string | null | undefined;
     nickName: string;
     gender : string | undefined;
     userImage: string | null;
@@ -30,7 +29,7 @@ interface Profile {
 const ProfileForm: React.FC = () => {
     //プロフィール
     const [profile, setProfile] = useState<Profile>
-    ({id: "", nickName: "", gender : undefined, age: undefined, height : undefined, 
+    ({nickName: "", gender : undefined, age: undefined, height : undefined, 
         userImage: "", userImage2: "",origin: "", hobby: "" , drive : undefined, annualIncome : undefined, 
         smoking : undefined, drinking : undefined, marriageWant : undefined, firstSon : undefined});
     const {user} = useAuthContext(); 
@@ -109,35 +108,41 @@ const ProfileForm: React.FC = () => {
     //送信ボタンを押した時の処理
     const handleSubmit = async (e : React.FormEvent ) => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
-        try {
-            // display nameを更新
-            if(user){
-                await updateProfile(user, {
-                    displayName:profile.nickName, // 新しいユーザーネーム
-                }).then(() => {
-                console.log("Display name updated successfully!");
-                }).catch((error) => {
-                console.error("Error updating display name:", error);
-                });
-            } else {
-                console.log("No user is signed in.");
+        const profileDocRef = doc(db, 'profiles', profile.nickName);
+        const profileDoc = await getDoc(profileDocRef);
+        if(profileDoc.exists()){
+            alert("そのニックネームは既に使用されています");
+        }else{
+            //try以下を追加
+            try {
+                // display nameを更新
+                if(user){
+                    await updateProfile(user, {
+                        displayName:profile.nickName, // 新しいユーザーネーム
+                    }).then(() => {
+                    console.log("Display name updated successfully!");
+                    }).catch((error) => {
+                    console.error("Error updating display name:", error);
+                    });
+                } else {
+                    console.log("No user is signed in.");
+                }
+                //イメージのアップロードがあるなら
+                if(image){
+                    const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
+                    console.log('Image uploaded successfully:', url);
+                    setProfile({...profile, userImage : url});//結果のURLをプロフィールに追加
+                }
+                if(image2){
+                    const url = await uploadFile(image2, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
+                    console.log('Image uploaded successfully:', url);
+                    setProfile({...profile, userImage2 : url});//結果のURLをプロフィールに追加
+                }
+                await setDoc(doc( db, "profiles", profile.nickName ), profile);//firebaseのFireStoreにプロフィールをぶちこむ
+                console.log('Profile saved successfully');
+            } catch(error){
+                console.error('Error saving Profile: ', error);
             }
-            //イメージのアップロードがあるなら
-            if(image){
-                const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
-                console.log('Image uploaded successfully:', url);
-                setProfile({...profile, userImage : url});//結果のURLをプロフィールに追加
-            }
-            if(image2){
-                const url = await uploadFile(image2, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
-                console.log('Image uploaded successfully:', url);
-                setProfile({...profile, userImage2 : url});//結果のURLをプロフィールに追加
-            }
-            setProfile({...profile, id : user?.email});
-            await addDoc(collection( db, "profiles" ), profile);    //firebaseのFireStoreにプロフィールをぶちこむ
-            console.log('Profile saved successfully');
-        } catch(error){
-            console.error('Error saving Profile: ', error);
         }
     }
 
