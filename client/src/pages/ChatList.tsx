@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "firebase/firestore";
 import { db } from "../infra/firebase";
 import { useNavigate } from "react-router-dom";
+import NaviButtons from '../components/NavigationButtons';
 import {
     Avatar,
-    Button,
     List,
     ListItem,
     Typography,
@@ -104,7 +104,7 @@ function ChatList() {
                     <ListItem
                         key={chat.id}
                         alignItems="flex-start"
-                        onClick={() => navigate(`/chat/${chat.id}`)}
+                        onClick={() => navigate(`/chat`)} // 個別チャットページへの遷移navigate(`/chat/${chat.id}`)} 
                         sx={{
                             borderRadius: "8px",
                             "&:hover": {
@@ -128,34 +128,7 @@ function ChatList() {
                     </ListItem>
                 ))}
             </List>
-            <Box sx={{ display: "flex", justifyContent: "space-between", marginTop: 2 }}>
-                <Button
-                    variant="contained"
-                    sx={{
-                        backgroundColor: "#96C78C",
-                        color: "#fff",
-                        "&:hover": {
-                            backgroundColor: "#88b078",
-                        },
-                    }}
-                    onClick={() => navigate("/home")}
-                >
-                    ホーム
-                </Button>
-                <Button
-                    variant="contained"
-                    sx={{
-                        backgroundColor: "#96C78C",
-                        color: "#fff",
-                        "&:hover": {
-                            backgroundColor: "#88b078",
-                        },
-                    }}
-                    onClick={() => navigate("/ProfileDisplay")}
-                >
-                    プロフィール
-                </Button>
-            </Box>
+            <NaviButtons/>
         </Box>
     );
 }

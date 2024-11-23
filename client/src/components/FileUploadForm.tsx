@@ -12,6 +12,7 @@ import { uploadFile } from '../feature/uploadFile'; // ファイルアップロ�
 import { Button, CircularProgress, TextField, Typography } from '@mui/material';
 import { useNavigate } from 'react-router-dom'; // useNavigateフックをインポート
 import "../style/auth.css";
+import NaviButtons from '../components/NavigationButtons';
 
 interface FileUploadFormProps {
   onFailure?: () => void; // エラー時のコールバックプロパティを追加
@@ -105,6 +106,7 @@ export const FileUploadForm: React.FC<FileUploadFormProps> = ({ onFailure, uploa
             {downloadURL && ( // downloadURLが存在する場合にのみ表示
               <div className="Item">
                 <Typography variant="body1">アップロードは成功しました</Typography>
+                <NaviButtons/>
               </div>
             )}
           </form>

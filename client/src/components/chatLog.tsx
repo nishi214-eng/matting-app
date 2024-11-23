@@ -14,13 +14,18 @@ import {
 } from 'firebase/firestore';
 import { useAuthContext } from '../store/AuthContext';
 import { sortName } from '../feature/sortName';
-import '../style/chatPage.css'
+import NaviButtons from './NavigationButtons';
 
-import { TextField, Button } from "@mui/material";
-import IconButton from '@mui/material/IconButton';
-import InputAdornment from '@mui/material/InputAdornment';
+import {
+  TextField,
+  Button,
+  Paper,
+  Typography,
+  Box,
+  IconButton,
+  InputAdornment
+} from '@mui/material';
 import { Send } from '@mui/icons-material';
-
 
 type ChatLog = {
   key: string;
@@ -35,158 +40,188 @@ const formatHHMM = (time: Date) => {
 };
 
 interface ChatLogViewProps {
-    partnerName:string;
+  partnerName: string;
 }
 
 const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
-    const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
-    const [inputMsg, setInputMsg] = useState('');
-    
-    // 利用中のユーザーののユーザーネームを取得
-    const {user} = useAuthContext(); 
-    
-    // const userName = user?.displayName||"";
-    const userName = "佐藤次郎"
-    // userとmyNameの並びを一意にすることでchatRoomの名前を特定
-    const sortNameArray = sortName(partnerName,userName);
-    const chatRoomName = sortNameArray[0] + "_" + sortNameArray[1];
+  const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
+  const [inputMsg, setInputMsg] = useState('');
 
-    // チャットルーム名
-    let chatRef = collection(db, 'chatroom',chatRoomName, 'messages');
-    
-    //チャットログに追加
-    const addLog = (id: string, data: any) => {
-        const log = {
-        key: id,
-        ...data,
-        };
-        // Firestoreから取得したデータは時間降順のため、表示前に昇順に並び替える
-        setChatLogs((prev) =>
-        [...prev, log].sort((a, b) => a.date.valueOf() - b.date.valueOf())
-        );
+  const { user } = useAuthContext();
+  const userName = '佐藤次郎';
+  const sortNameArray = sortName(partnerName, userName);
+  const chatRoomName = sortNameArray[0] + '_' + sortNameArray[1];
+  let chatRef = collection(db, 'chatroom', chatRoomName, 'messages');
+
+  const addLog = (id: string, data: any) => {
+    const log = {
+      key: id,
+      ...data,
     };
+    setChatLogs((prev) =>
+      [...prev, log].sort((a, b) => a.date.valueOf() - b.date.valueOf())
+    );
+  };
 
-    
-    // メッセージ送信
-    
-    const submitMsg = async (argMsg?: string) => {
-        const message = argMsg || inputMsg;
-        if (!message) {
-        return;
-        }
-        if(user){ //ログインしていれば
-            await addDoc(chatRef, {
-                name: userName,
-                msg: message,
-                date: new Date().getTime(),
-            });
-            const countRef = doc(
-                db, 
-                'chatroom', chatRoomName, 
-                'chatcount', 
-                userName === sortNameArray[0] ? 'count1' : 'count2'
-            );
-            await setDoc(countRef, { count: increment(1) }, { merge: true }); // 初期値を0に設定
-        }
+  const submitMsg = async (argMsg?: string) => {
+    const message = argMsg || inputMsg;
+    if (!message) return;
+    if (user) {
+      await addDoc(chatRef, {
+        name: userName,
+        msg: message,
+        date: new Date().getTime(),
+      });
+      const countRef = doc(
+        db,
+        'chatroom',
+        chatRoomName,
+        'chatcount',
+        userName === sortNameArray[0] ? 'count1' : 'count2'
+      );
+      await setDoc(countRef, { count: increment(1) }, { merge: true });
+    }
+    setInputMsg('');
+  };
 
-        setInputMsg('');
-    };
-
-    useEffect(() => {
-        if(user){ //ログインしていれば
-        // 最新10件取得。本番では50件まで増やす
-        const q = query(chatRef, orderBy('date', 'desc'), limit(10));
-        // データ同期(講読解除(cleanup)のためreturn)
-        return onSnapshot(q, (snapshot: QuerySnapshot) => {
+  useEffect(() => {
+    if (user) {
+      const q = query(chatRef, orderBy('date', 'desc'), limit(10));
+      return onSnapshot(q, (snapshot: QuerySnapshot) => {
         snapshot.docChanges().forEach((change) => {
-            if (change.type === 'added') {
-            // チャットログへ追加
+          if (change.type === 'added') {
             addLog(change.doc.id, change.doc.data());
-
-            // 画面最下部へスクロール
             const doc = document.documentElement;
             window.setTimeout(
-                () => window.scroll(0, doc.scrollHeight - doc.clientHeight),
-                100
+              () => window.scroll(0, doc.scrollHeight - doc.clientHeight),
+              100
             );
-            }
+          }
         });
-        });
+      });
+    }
+  }, []);
 
-    }}, []);
+  return (
 
-    return (
-        <div id='wrapper_chatLog'>
-            {/* チャットログ */}
-            <div id='outer_chatLogView'>
-                {chatLogs.map((item) => (
-                <div
-                    className={`balloon_${userName === item.name ? 'r' : 'l'}`}
-                    key={item.key}
+    <Box
+      id="wrapper_chatLog"
+      sx={{
+          maxWidth: "600px",
+          margin: "0 auto",
+          padding: "16px",
+          backgroundColor: "#f7f7f7",
+          borderRadius: "16px",
+          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+      }}
+    >
+
+      <Typography
+          variant="h5"
+          gutterBottom
+          sx={{
+              textAlign: "center",
+              marginBottom: "16px",
+              fontWeight: "bold",
+              color: "#333",
+          }}
+      >
+        {userName}
+      </Typography>
+      <Paper
+        id="outer_chatLogView"
+        sx={{
+          width: '100%',
+          maxWidth: '580px',
+          padding: '10px',
+          backgroundColor: '#ffffff',
+          borderRadius: '8px',
+          boxShadow: 2,
+          marginBottom: '20px',
+          overflowY: 'auto',
+          maxHeight: '60vh',
+        }}
+      >
+
+        
+        {chatLogs.map((item) => (
+          <Box
+            key={item.key}
+            sx={{
+              display: 'flex',
+              flexDirection: userName === item.name ? 'row-reverse' : 'row',
+              alignItems: 'flex-start',
+              marginBottom: '10px',
+            }}
+          >
+            <Paper
+              sx={{
+                padding: '10px',
+                maxWidth: '80%',
+                borderRadius: '16px',
+                backgroundColor: userName === item.name ? '#e1f5fe' : '#e8f5e9',
+              }}
+            >
+              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                {item.name}
+              </Typography>
+              <Typography variant="body2" sx={{ wordWrap: 'break-word' }}>
+                {item.msg}
+              </Typography>
+              <Typography
+                variant="caption"
+                sx={{ color: 'gray', display: 'block', textAlign: 'right' }}
+              >
+                {formatHHMM(item.date)}
+              </Typography>
+            </Paper>
+          </Box>
+        ))}
+      </Paper>
+
+      <form
+        className="inputform"
+        onSubmit={async (e) => {
+          e.preventDefault();
+          await submitMsg();
+        }}
+        style={{ width: '100%', maxWidth: '600px' }}
+      >
+        <TextField
+          id="text"
+          type="text"
+          value={inputMsg}
+          onChange={(e) => setInputMsg(e.target.value)}
+          placeholder="メッセージを入力..."
+          fullWidth
+          variant="outlined"
+          InputProps={{
+            endAdornment: (
+              <InputAdornment position="end">
+                <IconButton
+                  aria-label="send-message"
+                  onClick={() => submitMsg()}
                 >
-                    {userName === item.name ? `[${formatHHMM(item.date)}]` : ''}
-                    <div className="faceicon">
-                    
-                    </div>
-                    <div style={{ marginLeft: '3px' }}>
-                    {item.name}
-                    <p className="says">{item.msg}</p>
-                    </div>
-                    {userName === item.name ? '' : `[${formatHHMM(item.date)}]`}
-                </div>
-                ))}
-            </div>
+                  <Send />
+                </IconButton>
+              </InputAdornment>
+            ),
+          }}
+          sx={{
+            backgroundColor: 'white',
+            '& .MuiOutlinedInput-root': {
+              borderRadius: '16px',
+            },
+            '& .MuiOutlinedInput-notchedOutline': {
+              borderColor: '#96C78C',
+            },
+          }}
+        />
             
-            {/* メッセージ入力 コンポーネント化する*/}
-            <div className='inputform'>
-                <form
-                    className="chatform_outer"
-                    onSubmit={async (e) => {
-                    e.preventDefault();
-                    await submitMsg();
-                    }}
-                > 
-                    <TextField
-                        id="text"
-                        type="text"
-                        value={inputMsg}
-                        onChange={(e) => setInputMsg(e.target.value)}
-                        fullWidth
-                            variant="outlined"
-                            sx={{
-                            backgroundColor: "white",
-                            '& .MuiInputBase-input': {
-                                height: '100%',
-                                padding: '10px', 
-                            },
-                            '& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline': {
-                                borderColor: '#96C78C', // フォーカス時のボーダー色
-                            },
-                            '& .MuiFormHelperText-root': { // ここを修正
-                                margin: '0px', // マージンを0に設定
-                            },
-                        }}
-                        
-                    
-                        slotProps={{
-                            input: {
-                                endAdornment: (
-                                <InputAdornment position="end">
-                                    <IconButton
-                                        aria-label="send-message"
-                                        onClick={() => submitMsg}
-                                    >
-                                        <Send/>
-                                    </IconButton>
-                                </InputAdornment>
-                                ),
-                            },
-                            }}           
-                        />
-                </form>
-            </div>
-        </div>
-    );
+      </form>
+      <NaviButtons/>
+    </Box>
+  );
 };
 
 export default ChatLogView;
