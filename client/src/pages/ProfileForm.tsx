@@ -3,7 +3,10 @@ import { db } from "../infra/firebase";
 import { doc, collection, setDoc, getDoc } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
-import { Select } from "@mui/material";
+import NaviButtons from '../components/NavigationButtons';
+import { Box,Typography,Select } from "@mui/material";
+import { updateProfile } from "firebase/auth";
+
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
@@ -112,6 +115,18 @@ const ProfileForm: React.FC = () => {
         }else{
             //try以下を追加
             try {
+                // display nameを更新
+                if(user){
+                    await updateProfile(user, {
+                        displayName:profile.nickName, // 新しいユーザーネーム
+                    }).then(() => {
+                    console.log("Display name updated successfully!");
+                    }).catch((error) => {
+                    console.error("Error updating display name:", error);
+                    });
+                } else {
+                    console.log("No user is signed in.");
+                }
                 //イメージのアップロードがあるなら
                 if(image){
                     const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
@@ -132,10 +147,33 @@ const ProfileForm: React.FC = () => {
     }
 
     return(
+        <Box
+            sx={{
+                maxWidth: "600px",
+                margin: "0 auto",
+                padding: "16px",
+                backgroundColor: "#f7f7f7",
+                borderRadius: "16px",
+                boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+            }}
+        >
+            <Typography
+                variant="h5"
+                gutterBottom
+                sx={{
+                    textAlign: "center",
+                    marginBottom: "16px",
+                    fontWeight: "bold",
+                    color: "#333",
+                }}
+            >
+                プロフィール編集
+            </Typography>
         <form onSubmit={handleSubmit}>
             <div>
-                <label>ニックネーム:
-                    <input type="text" name="nickName" value={profile.nickName} onChange={handleChange} />
+                <label>
+                ニックネーム:
+                <input type="text" name="nickName" value={profile.nickName} onChange={handleChange}/>
                 </label>
             </div>
             <div>
@@ -270,7 +308,9 @@ const ProfileForm: React.FC = () => {
                 </label>
             </div>
             <button type = "submit">Submit</button>
+            <NaviButtons/>
         </form>
+        </Box>
     );
 };
 
