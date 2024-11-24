@@ -16,7 +16,7 @@ interface Profile {
     userImage2: string | null;
     age: number | "";
     height : number |  "";
-    origin: string;
+    origin: string | "";
     hobby: string;
     drive: string |  "";
     annualIncome : string |  "";
@@ -45,6 +45,13 @@ const ProfileForm: React.FC = () => {
     const doDont= ["", "する", "しない"];
     const exist = ["", "ある", "なし"];
     const drive = ["", "しない", "車", "バイク", "どちらも"];
+    const prefectures = 
+    ["", "北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県",
+        "埼玉県", "千葉県", "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県",
+        "岐阜県", "静岡県", "愛知県", "三重県", "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県",
+        "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県", "香川県", "愛媛県", "高知県", "福岡県",
+        "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"];
+
 
     const [image, setImage] = useState<File | null>(null);//アイコンイメージ
     const [image2, setImage2] = useState<File | null>(null);//アイコンイメージ
@@ -240,7 +247,13 @@ const ProfileForm: React.FC = () => {
             </div>
             <div>
                 <label>出身:
-                    <input type="text" name="origin" value={profile.origin} onChange={handleChange} />
+                    <select name="origin" value={profile.origin} onChange={handleOptionChange}>
+                        <option value="" disabled>選択してください</option>
+                        {prefectures.map(origin => (
+                            <option key={origin} value={origin}>{origin}</option>
+                        ))}
+                    </select>
+                    {profile.origin !=  "" && <p>運転するか: {profile.origin}</p>}
                 </label>
             </div>
             <div>
