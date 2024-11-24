@@ -104,7 +104,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
 
   return (
 
-    <Box
+    <Paper
       id="wrapper_chatLog"
       sx={{
           maxWidth: "600px",
@@ -126,7 +126,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
               color: "#333",
           }}
       >
-        {userName}
+        {'相手の名前'}
       </Typography>
       <Paper
         id="outer_chatLogView"
@@ -149,17 +149,18 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
             key={item.key}
             sx={{
               display: 'flex',
-              flexDirection: userName === item.name ? 'row-reverse' : 'row',
+              flexDirection: userName === item.name ? 'row-reverse':'row',
               alignItems: 'flex-start',
               marginBottom: '10px',
             }}
           >
             <Paper
+              className={userName === item.name ? 'balloon_l' : 'balloon_r'}
               sx={{
                 padding: '10px',
                 maxWidth: '80%',
                 borderRadius: '16px',
-                backgroundColor: userName === item.name ? '#e1f5fe' : '#e8f5e9',
+                backgroundColor: userName === item.name ? '#e1f5fe':'#e8f5e9',
               }}
             >
               <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
@@ -220,7 +221,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
             
       </form>
       <NaviButtons/>
-    </Box>
+    </Paper>
   );
 };
 

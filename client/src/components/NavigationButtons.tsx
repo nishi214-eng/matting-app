@@ -17,7 +17,7 @@ const NavigationButtons: React.FC = () => {
             backgroundColor: "#88b078",
           },
         }}
-        onClick={() => navigateTo("/home")}
+        onClick={() => navigateTo("/Home")}
       >
         ホーム
       </Button>
