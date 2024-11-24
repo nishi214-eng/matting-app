@@ -11,31 +11,30 @@ import { updateProfile } from "firebase/auth";
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
     nickName: string;
-    gender : string | undefined;
+    gender : string |  "";
     userImage: string | null;
     userImage2: string | null;
-    age: number | undefined;
-    height : number | undefined;
+    age: number | "";
+    height : number |  "";
     origin: string;
     hobby: string;
-    drive: string | undefined;
-    annualIncome : string | undefined;
-    smoking : string | undefined;
-    drinking : string | undefined;
-    marriageWant : string | undefined;
-    firstSon : string | undefined;
+    drive: string |  "";
+    annualIncome : string |  "";
+    smoking : string |  "";
+    drinking : string |  "";
+    marriageWant : string |  "";
+    firstSon : string |  "";
 };
 
 const ProfileForm: React.FC = () => {
     //プロフィール
-    const [profile, setProfile] = useState<Profile>
-    ({nickName: "", gender : undefined, age: undefined, height : undefined, 
-        userImage: "", userImage2: "",origin: "", hobby: "" , drive : undefined, annualIncome : undefined, 
-        smoking : undefined, drinking : undefined, marriageWant : undefined, firstSon : undefined});
+    const [profile, setProfile] = useState<Profile>({nickName: "", gender :  "", age: "", height :  "",
+        userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
+        drinking :  "", marriageWant :  "", firstSon :  ""});
     const {user} = useAuthContext(); 
     //入力の際の候補
     const age = [ , 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
-        42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60
+        41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60
     ];
     const gender = [ "", "男", "女", "未回答"];
     const height = [ , 140, 145, 150, 155, 160, 165, 170, 175, 180, 185, 190, 195, 200];
@@ -138,7 +137,15 @@ const ProfileForm: React.FC = () => {
                     console.log('Image uploaded successfully:', url);
                     setProfile({...profile, userImage2 : url});//結果のURLをプロフィールに追加
                 }
-                await setDoc(doc( db, "profiles", profile.nickName ), profile);//firebaseのFireStoreにプロフィールをぶちこむ
+                // profiles コレクション内の profileNickName ドキュメントを参照
+                const profileDocRef = doc(db, "profiles", profile.nickName);
+
+                // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
+                const dataDocRef = doc(profileDocRef, "profile", "data");
+
+                // "data" ドキュメントに profile のデータをセット
+                await setDoc(dataDocRef, profile);
+
                 console.log('Profile saved successfully');
             } catch(error){
                 console.error('Error saving Profile: ', error);
@@ -184,7 +191,7 @@ const ProfileForm: React.FC = () => {
                             <option key={gender} value={gender}>{gender}</option>
                         ))}
                     </select>
-                    {profile.gender != undefined && <p>性別: {profile.gender}</p>}
+                    {profile.gender !=  ""&& <p>性別: {profile.gender}</p>}
                 </label>
             </div>
             <div>
@@ -195,7 +202,7 @@ const ProfileForm: React.FC = () => {
                             <option key={age} value={age}>{age}</option>
                         ))}
                     </select>
-                    {profile.age != undefined && <p>選択された年齢: {profile.age}</p>}
+                    {profile.age && <p>選択された年齢: {profile.age}</p>}
                 </label>
             </div>
             <div>
@@ -206,7 +213,7 @@ const ProfileForm: React.FC = () => {
                             <option key={height} value={height}>{height}</option>
                         ))}
                     </select>
-                    {profile.height != undefined && <p>選択された身長: {profile.height}</p>}
+                    {profile.height !=  "" && <p>選択された身長: {profile.height}</p>}
                 </label>
             </div>
             <div>
@@ -249,7 +256,7 @@ const ProfileForm: React.FC = () => {
                             <option key={drive} value={drive}>{drive}</option>
                         ))}
                     </select>
-                    {profile.drive != undefined && <p>運転するか: {profile.drive}</p>}
+                    {profile.drive !=  "" && <p>運転するか: {profile.drive}</p>}
                 </label>
             </div>
             <div>
@@ -260,7 +267,7 @@ const ProfileForm: React.FC = () => {
                             <option key={annualIncome} value={annualIncome}>{annualIncome}</option>
                         ))}
                     </select>
-                    {profile.annualIncome != undefined && <p>年収: {profile.annualIncome}</p>}
+                    {profile.annualIncome !=  "" && <p>年収: {profile.annualIncome}</p>}
                 </label>
             </div>
             <div>
@@ -271,7 +278,7 @@ const ProfileForm: React.FC = () => {
                             <option key={doDont} value={doDont}>{doDont}</option>
                         ))}
                     </select>
-                    {profile.smoking != undefined && <p>喫煙: {profile.smoking}</p>}
+                    {profile.smoking !=  "" && <p>喫煙: {profile.smoking}</p>}
                 </label>
             </div>
             <div>
@@ -282,7 +289,7 @@ const ProfileForm: React.FC = () => {
                             <option key={doDont} value={doDont}>{doDont}</option>
                         ))}
                     </select>
-                    {profile.drinking != undefined && <p>飲酒: {profile.drinking}</p>}
+                    {profile.drinking !=  "" && <p>飲酒: {profile.drinking}</p>}
                 </label>
             </div>
             <div>
@@ -293,18 +300,18 @@ const ProfileForm: React.FC = () => {
                             <option key={exist} value={exist}>{exist}</option>
                         ))}
                     </select>
-                    {profile.marriageWant != undefined && <p>結婚願望: {profile.marriageWant}</p>}
+                    {profile.marriageWant !=  "" && <p>結婚願望: {profile.marriageWant}</p>}
                 </label>
             </div>
             <div>
                 <label>長男:
-                    <select name="marriageWant" value={profile.marriageWant} onChange={handleOptionChange}>
+                    <select name="firstSon" value={profile.firstSon} onChange={handleOptionChange}>
                         <option value="" disabled>選択してください</option>
-                        {exist.map(yesNo => (
+                        {yesNo.map(yesNo => (
                             <option key={yesNo} value={yesNo}>{yesNo}</option>
                         ))}
                     </select>
-                    {profile.firstSon != undefined && <p>長男: {profile.firstSon}</p>}
+                    {profile.firstSon !=  "" && <p>長男: {profile.firstSon}</p>}
                 </label>
             </div>
             <button type = "submit">Submit</button>
