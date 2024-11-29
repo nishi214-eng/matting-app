@@ -1,11 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { db } from "../infra/firebase";
 import { doc, setDoc, getDoc } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
 import { Button, Box,Typography, TextField, MenuItem, FormControl, InputLabel } from "@mui/material";
-import { updateProfile } from "firebase/auth";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MuiFileInput } from 'mui-file-input';
 
@@ -28,12 +27,12 @@ interface Profile {
     firstSon : string |  "";
 };
 
-const ProfileForm: React.FC = () => {
-    //プロフィール
-    const [profile, setProfile] = useState<Profile>({nickName: "", gender :  "", age: "", height :  "",
+const ProfileChange: React.FC = () => {
+    const {user} = useAuthContext(); 
+    //プロフィール・ただしnicknameのついては初期に入力されたものからの変更は禁止
+    const [profile, setProfile] = useState<Profile>({nickName: user?.displayName as string, gender :  "", age: "", height :  "",
         userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
         drinking :  "", marriageWant :  "", firstSon :  ""});
-    const {user} = useAuthContext(); 
     //入力の際の候補
     const age = [18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
         41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60];
@@ -57,6 +56,25 @@ const ProfileForm: React.FC = () => {
     const [image2, setImage2] = useState<File | null>(null);//アイコンイメージ
     const [imageUrl, setImageUrl] = useState<string | null>(null);//仮置き、入力されたアイコン画像
     const [imageUrl2, setImageUrl2] = useState<string | null>(null);//仮置き、入力されたアイコン画像
+    const [preImage, setPreImage] = useState<string | "">("");//変更前のユーザーのアイコン
+    const [preImage2, setPreImage2] = useState<string | "">("");//変更前のユーザーのアイコン
+
+    //登録者自身のプロフィールを取得してデータに格納
+    useEffect(() => {
+        const fetchProfiles = async () => {
+            // profiles コレクション内の profileNickName ドキュメントを参照
+            const profileDocRef = doc(db, "profiles", profile.nickName);
+            // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
+            const dataDocRef = doc(profileDocRef, "profile", "data");
+            const querySnapshot = await getDoc(dataDocRef);
+            const profilesData: Profile = querySnapshot.data() as Profile;
+            setProfile(profilesData);
+            setPreImage(profilesData.userImage);
+            setPreImage2(profilesData.userImage2);
+        };
+        
+        fetchProfiles();
+    }, []);
 
     //フォームにイメージの入力があった場合
     const handleSetImage3 = (newFile: File | null) => {
@@ -100,51 +118,31 @@ const ProfileForm: React.FC = () => {
     //送信ボタンを押した時の処理
     const handleSubmit = async (e : React.FormEvent ) => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
-        const profileDocRef = doc(db, 'profiles', profile.nickName);
-        const profileDoc = await getDoc(profileDocRef);
-        if(profileDoc.exists()){
-            alert("そのニックネームは既に使用されています");
-        }else if(profile.nickName === ""){
-            alert("ニックネームを入力してください");
-        }else{
-            //try以下を追加
-            try {
-                // display nameを更新
-                if(user){
-                    await updateProfile(user, {
-                        displayName:profile.nickName, // 新しいユーザーネーム
-                    }).then(() => {
-                    console.log("Display name updated successfully!");
-                    }).catch((error) => {
-                    console.error("Error updating display name:", error);
-                    });
-                } else {
-                    console.log("No user is signed in.");
-                }
-                //イメージのアップロードがあるなら
-                if(image){
-                    const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
-                    console.log('Image uploaded successfully:', url);
-                    setProfile({...profile, userImage : url as string});//結果のURLをプロフィールに追加
-                }
-                if(image2){
-                    const url2 = await uploadFile(image2, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
-                    console.log('Image uploaded successfully:', url2);
-                    setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
-                }
-                // profiles コレクション内の profileNickName ドキュメントを参照
-                const profileDocRef = doc(db, "profiles", profile.nickName);
-
-                // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
-                const dataDocRef = doc(profileDocRef, "profile", "data");
-
-                // "data" ドキュメントに profile のデータをセット
-                await setDoc(dataDocRef, profile);
-
-                console.log('Profile saved successfully');
-            } catch(error){
-                console.error('Error saving Profile: ', error);
+        //try以下を追加
+        try {
+            //イメージのアップロードがあるなら
+            if(image){
+                const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url);
+                setProfile({...profile, userImage : url as string});//結果のURLをプロフィールに追加
             }
+            if(image2){
+                const url2 = await uploadFile(image2, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url2);
+                setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
+            }
+            // profiles コレクション内の profileNickName ドキュメントを参照
+            const profileDocRef = doc(db, "profiles", profile.nickName);
+
+            // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
+            const dataDocRef = doc(profileDocRef, "profile", "data");
+
+            // "data" ドキュメントに profile のデータをセット
+            await setDoc(dataDocRef, profile);
+
+            console.log('Profile saved successfully');
+        } catch(error){
+            console.error('Error saving Profile: ', error);
         }
     }
 
@@ -169,12 +167,14 @@ const ProfileForm: React.FC = () => {
                     color: "#333",
                 }}
             >
-                プロフィール登録
+                プロフィール編集
             </Typography>
         <form onSubmit={handleSubmit}>
-            <TextField id="nikcName" label="ニックネーム" value={profile.nickName} sx={{ m: 1, minWidth: 120, width: 250 }} size="small"
+            <TextField id="nikcName" label="ニックネーム"  disabled value={profile.nickName} sx={{ m: 1, minWidth: 120, width: 250 }} size="small"
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => { setProfile({...profile, nickName : event.target.value});}}
             />
+            <br />
+            <Typography variant="caption" component="div" gutterBottom>※ニックネームは変更できません</Typography>
             <br />
             <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="gender-select-small-label">性別</InputLabel>
@@ -225,6 +225,12 @@ const ProfileForm: React.FC = () => {
                     <Button onClick={handleReset} variant="outlined">Reset</Button>
                 </div>
             )}
+            {(!imageUrl && preImage != "") && (
+                <div>
+                    <img src={preImage} alt="selected" style={{ height: '300px', width: '300px' }} />
+                    <Typography variant="caption" component="div" gutterBottom>変更前のアイコン</Typography>
+                </div>
+            )}
             <Typography variant="body1" component="h6" mt={1} gutterBottom>アイコン画像2・選択</Typography>
             <MuiFileInput value={image2} onChange={handleSetImage4} variant="outlined" sx={{ m: 1, minWidth: 120, width: 250 }} />
             <br />
@@ -236,6 +242,12 @@ const ProfileForm: React.FC = () => {
                 <div>
                     <img src={imageUrl2} alt="selected" style={{ height: '300px', width: '300px' }} />
                     <Button onClick={handleReset2} variant="outlined">Reset</Button>
+                </div>
+            )}
+            {(!imageUrl2 && preImage2 != "") && (
+                <div>
+                    <img src={preImage2} alt="selected" style={{ height: '300px', width: '300px' }} />
+                    <Typography variant="caption" component="div" gutterBottom>変更前のアイコン2</Typography>
                 </div>
             )}
 
@@ -327,7 +339,7 @@ const ProfileForm: React.FC = () => {
                 </Select>
             </FormControl>
             <br />
-            <Button variant = "contained" type = "submit">登録</Button>
+            <Button variant = "contained" type = "submit">更新</Button>
             <NaviButtons/>
         </form>
         </Box>
@@ -335,4 +347,4 @@ const ProfileForm: React.FC = () => {
 };
 
 
-export default ProfileForm;
+export default ProfileChange;
