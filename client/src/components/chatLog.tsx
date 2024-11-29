@@ -15,6 +15,7 @@ import {
 import { useAuthContext } from '../store/AuthContext';
 import { sortName } from '../feature/sortName';
 import NaviButtons from './NavigationButtons';
+import { useNavigate } from 'react-router-dom';
 
 import {
   TextField,
@@ -102,6 +103,12 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
     }
   }, []);
 
+  const navigate = useNavigate();  // useNavigate を呼び出し
+
+  const handleNavigate = () => {
+    navigate('/DisplayOther');  // "/bell" ページに遷移
+  };
+
   return (
 
     <Paper
@@ -116,18 +123,23 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
       }}
     >
 
-      <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-              textAlign: "center",
-              marginBottom: "16px",
-              fontWeight: "bold",
-              color: "#333",
-          }}
-      >
-        {partnerName}
-      </Typography>
+    <Button
+      variant="text"
+      onClick={handleNavigate}
+      sx={{
+        textAlign: 'center',
+        marginBottom: 2,
+        fontWeight: 'bold',
+        color: '#333',
+        padding: 0,
+        textTransform: 'none', 
+        '&:hover': {
+          backgroundColor: 'transparent',  // ホバー時に背景色が変わらないように設定
+        }
+      }}
+    >
+      {partnerName}
+    </Button>
       <Paper
         id="outer_chatLogView"
         sx={{

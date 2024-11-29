@@ -4,6 +4,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { sortName } from "../feature/sortName";
 import { Box, TextField, Typography } from "@mui/material";
+import { useLocation } from "react-router-dom";
+import { useAuthContext } from '../store/AuthContext'; 
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
@@ -30,11 +32,15 @@ interface Matting {
 };
 
 const DisplayOther: React.FC = () => {
+    const { user } = useAuthContext(); // ユーザーの表示
     //他ユーザの名前を受け取る。この人を表示することになる
-    const otherUserName = "花山薫";
-    const [matting, setMatti] = useState<Matting>({name: "佐藤次郎", count1:0, count2:0});
+    const location = useLocation();
+    const { partnerName } = location.state || { partnerName: '名称未設定' };
+
+    const [matting, setMatti] = useState<Matting>({name: user?.displayName as string, count1:0, count2:0});
+    
     //プロフィール
-    const [profile, setProfile] = useState<Profile>({nickName: otherUserName, gender :  "", age: "", height :  "",
+    const [profile, setProfile] = useState<Profile>({nickName: partnerName, gender :  "", age: "", height :  "",
         userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
         drinking :  "", marriageWant :  "", firstSon :  ""});
 
