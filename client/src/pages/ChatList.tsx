@@ -42,7 +42,7 @@ function ChatList() {
                             return {
                                 id: userDoc.id, // userIdを保存
                                 name: data.name || "名前未設定", // デフォルト値
-                                lastMessage: data.lastMessage || "メッセージなし",
+                                lastMessage: data.message || "メッセージなし",
                                 timestamp: data.timestamp?.seconds || 0, // Firestore Timestamp を変換
                                 userImage: data.userImage || "",
                                 age: data.age || 0, // デフォルト値
