@@ -5,7 +5,6 @@ import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
 import { Button, Box,Typography, TextField, MenuItem, FormControl, InputLabel } from "@mui/material";
-import { updateProfile } from "firebase/auth";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MuiFileInput } from 'mui-file-input';
 
@@ -69,7 +68,7 @@ const ProfileChange: React.FC = () => {
             const profilesData: Profile = querySnapshot.data() as Profile;
             setProfile(profilesData);
         };
-
+        
         fetchProfiles();
     }, []);
 
@@ -115,51 +114,31 @@ const ProfileChange: React.FC = () => {
     //送信ボタンを押した時の処理
     const handleSubmit = async (e : React.FormEvent ) => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
-        const profileDocRef = doc(db, 'profiles', profile.nickName);
-        const profileDoc = await getDoc(profileDocRef);
-        if(profileDoc.exists()){
-            alert("そのニックネームは既に使用されています");
-        }else if(profile.nickName == ""){
-            alert("ニックネームを入力してください");
-        }else{
-            //try以下を追加
-            try {
-                // display nameを更新
-                if(user){
-                    await updateProfile(user, {
-                        displayName:profile.nickName, // 新しいユーザーネーム
-                    }).then(() => {
-                    console.log("Display name updated successfully!");
-                    }).catch((error) => {
-                    console.error("Error updating display name:", error);
-                    });
-                } else {
-                    console.log("No user is signed in.");
-                }
-                //イメージのアップロードがあるなら
-                if(image){
-                    const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
-                    console.log('Image uploaded successfully:', url);
-                    setProfile({...profile, userImage : url as string});//結果のURLをプロフィールに追加
-                }
-                if(image2){
-                    const url2 = await uploadFile(image2, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
-                    console.log('Image uploaded successfully:', url2);
-                    setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
-                }
-                // profiles コレクション内の profileNickName ドキュメントを参照
-                const profileDocRef = doc(db, "profiles", profile.nickName);
-
-                // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
-                const dataDocRef = doc(profileDocRef, "profile", "data");
-
-                // "data" ドキュメントに profile のデータをセット
-                await setDoc(dataDocRef, profile);
-
-                console.log('Profile saved successfully');
-            } catch(error){
-                console.error('Error saving Profile: ', error);
+        //try以下を追加
+        try {
+            //イメージのアップロードがあるなら
+            if(image){
+                const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url);
+                setProfile({...profile, userImage : url as string});//結果のURLをプロフィールに追加
             }
+            if(image2){
+                const url2 = await uploadFile(image2, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
+                console.log('Image uploaded successfully:', url2);
+                setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
+            }
+            // profiles コレクション内の profileNickName ドキュメントを参照
+            const profileDocRef = doc(db, "profiles", profile.nickName);
+
+            // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
+            const dataDocRef = doc(profileDocRef, "profile", "data");
+
+            // "data" ドキュメントに profile のデータをセット
+            await setDoc(dataDocRef, profile);
+
+            console.log('Profile saved successfully');
+        } catch(error){
+            console.error('Error saving Profile: ', error);
         }
     }
 
