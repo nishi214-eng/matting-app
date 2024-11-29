@@ -3,6 +3,7 @@ import { Box, Typography, Button, Card, CardMedia, CardContent, CircularProgress
 import { db } from "../infra/firebase";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { useAuthContext } from '../store/AuthContext';
+import NaviButtons from '../components/NavigationButtons';
 
 // Candidate型を拡張
 interface Candidate {
@@ -34,6 +35,7 @@ const MatchingPage: React.FC = () => {
     const [waitingCandidates, setWaitingCandidates] = useState<Candidate[]>([]); // マッチング待ちの候補者
     const [openSkipListDialog, setOpenSkipListDialog] = useState<boolean>(false); // スキップリストのダイアログの表示状態
     const [openMatchingListDialog, setOpenMatchingListDialog] = useState<boolean>(false); // マッチング待ちリストのダイアログの表示状態
+    const userNickName = user?.displayName
 
   // ユーザーと候補者のデータを取得
   useEffect(() => {
@@ -166,6 +168,9 @@ const MatchingPage: React.FC = () => {
       alert(`${matched.nickName}にいいねしました！`);
 
       setMatchedCandidate(matched);
+          setCandidates(prevCandidates =>
+      prevCandidates.filter(candidate => candidate.id !== matched.id)
+    );
       fetchNextCandidate();
     } catch (error) {
       console.error("Error adding to matching list: ", error);
@@ -286,6 +291,7 @@ const MatchingPage: React.FC = () => {
           <Button onClick={handleCloseMatchingListDialog}>閉じる</Button>
         </DialogActions>
       </Dialog>
+      <NaviButtons/>
     </Box>
   );
 };

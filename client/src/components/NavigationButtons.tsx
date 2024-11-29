@@ -30,6 +30,19 @@ const NavigationButtons: React.FC = () => {
             backgroundColor: "#88b078",
           },
         }}
+        onClick={() => navigateTo("/ChatList")}
+      >
+        チャットリスト
+      </Button>
+      <Button
+        variant="contained"
+        sx={{
+          backgroundColor: "#96C78C",
+          color: "#fff",
+          "&:hover": {
+            backgroundColor: "#88b078",
+          },
+        }}
         onClick={() => navigateTo("/ProfileDisplay")}
       >
         プロフィール

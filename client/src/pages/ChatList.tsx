@@ -3,6 +3,7 @@ import { collection, getDocs, QueryDocumentSnapshot, DocumentData } from "fireba
 import { db } from "../infra/firebase";
 import { useNavigate } from "react-router-dom";
 import NaviButtons from '../components/NavigationButtons';
+import { useAuthContext } from '../store/AuthContext';
 import {
     Avatar,
     List,
@@ -27,6 +28,7 @@ function ChatList() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string | null>(null);
     const navigate = useNavigate();
+    const { user } = useAuthContext(); // useAuthContextからユーザー情報を取得
 
     useEffect(() => {
         const fetchChats = async () => {
@@ -34,7 +36,7 @@ function ChatList() {
                 const querySnapshot1 = await getDocs(collection(db, "chatroom"));
                 const chatData = await Promise.all(
                     querySnapshot1.docs.map(async (doc: QueryDocumentSnapshot<DocumentData>) => {
-                        const chatRef = collection(db, `chatroom/${doc.id}/userIdList`);
+                        const chatRef = collection(db, "profiles");
                         const userDocs = await getDocs(chatRef);
 
                         return userDocs.docs.map((userDoc) => {
