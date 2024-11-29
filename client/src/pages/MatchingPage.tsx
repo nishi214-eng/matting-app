@@ -4,6 +4,8 @@ import { db } from "../infra/firebase";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
+import { AlertContext } from '../store/useSnackber';
+import { useContext } from 'react';
 
 // Candidate型を拡張
 interface Candidate {
@@ -26,8 +28,9 @@ const MatchingPage: React.FC = () => {
     const [waitingCandidates, setWaitingCandidates] = useState<Candidate[]>([]); // マッチング待ちの候補者
     const [openSkipListDialog, setOpenSkipListDialog] = useState<boolean>(false); // スキップリストのダイアログの表示状態
     const [openMatchingListDialog, setOpenMatchingListDialog] = useState<boolean>(false); // マッチング待ちリストのダイアログの表示状態
-    const userNickName = user?.displayName　as string
+    const userNickName = user?.displayName as string
 
+    const { showAlert } = useContext(AlertContext);
   // ユーザーと候補者のデータを取得
   useEffect(() => {
     const fetchUserProfile = async () => {
@@ -118,7 +121,7 @@ const MatchingPage: React.FC = () => {
     if (currentIndex + 1 < candidates.length) {
       setCurrentIndex(prevIndex => prevIndex + 1);
     } else {
-      alert("候補者がいません！");
+      showAlert(`候補者がいません！`,"error");
     }
   };
 
@@ -137,8 +140,7 @@ const MatchingPage: React.FC = () => {
         id: matched.id,
         nickName: matched.nickName, // Only store nickName
       });
-
-      alert(`${matched.nickName}にいいねしました！`);
+      showAlert(`${matched.nickName}にいいねしました！`,"success");
 
       setMatchedCandidate(matched);
           setCandidates(prevCandidates =>
@@ -147,7 +149,7 @@ const MatchingPage: React.FC = () => {
       fetchNextCandidate();
     } catch (error) {
       console.error("Error adding to matching list: ", error);
-      alert("マッチングリストへの追加中にエラーが発生しました。再試行してください。");
+      showAlert(`マッチングリストへの追加中にエラーが発生しました。再試行してください。`,"error");
     }
   };
 
@@ -165,8 +167,7 @@ const MatchingPage: React.FC = () => {
 
       fetchNextCandidate();
     } catch (error) {
-      console.error("Error skipping candidate: ", error);
-      alert("候補者をスキップできませんでした。再試行してください。");
+      showAlert(`候補者をスキップできませんでした。再試行してください。`,"error");
     }
   };
 

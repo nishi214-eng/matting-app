@@ -7,7 +7,10 @@ import NaviButtons from '../components/NavigationButtons';
 import { Button, Box,Typography, TextField, MenuItem, FormControl, InputLabel } from "@mui/material";
 import Select, { SelectChangeEvent } from '@mui/material/Select';
 import { MuiFileInput } from 'mui-file-input';
-
+import { updateProfile } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
+import { AlertContext } from '../store/useSnackber';
+import { useContext } from 'react';
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
@@ -28,7 +31,9 @@ interface Profile {
 };
 
 const ProfileChange: React.FC = () => {
-    const {user} = useAuthContext(); 
+    const {user} = useAuthContext();
+    const navigate = useNavigate();
+    const { showAlert } = useContext(AlertContext);
     //プロフィール・ただしnicknameのついては初期に入力されたものからの変更は禁止
     const [profile, setProfile] = useState<Profile>({nickName: user?.displayName as string, gender :  "", age: "", height :  "",
         userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
@@ -120,6 +125,14 @@ const ProfileChange: React.FC = () => {
         e.preventDefault(); //フォームに対するユーザーからの操作を阻止
         //try以下を追加
         try {
+            if(profile.nickName){
+                if(user){
+                    await updateProfile(user, {
+                        displayName:profile.nickName, // 新しいユーザーネーム
+                    }).then(() => {
+                    console.log("Display name updated successfully!");
+                })};
+            }
             //イメージのアップロードがあるなら
             if(image){
                 const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
@@ -139,8 +152,8 @@ const ProfileChange: React.FC = () => {
 
             // "data" ドキュメントに profile のデータをセット
             await setDoc(dataDocRef, profile);
+            navigate("/Home")
 
-            console.log('Profile saved successfully');
         } catch(error){
             console.error('Error saving Profile: ', error);
         }

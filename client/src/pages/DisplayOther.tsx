@@ -4,8 +4,8 @@ import { doc, getDoc } from "firebase/firestore";
 import { Link } from "react-router-dom";
 import { sortName } from "../feature/sortName";
 import { Box, TextField, Typography } from "@mui/material";
+import { useAuthContext } from '../store/AuthContext';
 import { useLocation } from "react-router-dom";
-import { useAuthContext } from '../store/AuthContext'; 
 
 //プロフィールオブジェクトの型定義。プロフィールの項目はこちらから
 interface Profile {
@@ -32,13 +32,13 @@ interface Matting {
 };
 
 const DisplayOther: React.FC = () => {
+    //他ユーザの名前を受け取る。この人を表示することになる。本番にはユーザネームを取得する
     const { user } = useAuthContext(); // ユーザーの表示
     //他ユーザの名前を受け取る。この人を表示することになる
     const location = useLocation();
     const { partnerName } = location.state || { partnerName: '名称未設定' };
 
     const [matting, setMatti] = useState<Matting>({name: user?.displayName as string, count1:0, count2:0});
-    
     //プロフィール
     const [profile, setProfile] = useState<Profile>({nickName: partnerName, gender :  "", age: "", height :  "",
         userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
@@ -99,7 +99,7 @@ const DisplayOther: React.FC = () => {
             color: "#333",
         }}
       >
-        あなたのプロフィール
+        {partnerName}のプロフィール
       </Typography>
       <TextField id="nikcName" label="ニックネーム" value={profile.nickName} sx={{ m: 1, minWidth: 120, width: 250 }} size="small"
           onChange={handleChange}
@@ -226,11 +226,6 @@ const DisplayOther: React.FC = () => {
       />
       <br />
       </Box>
-      <div className="linkItem">
-        <Link to={"/ProfileForm"} >
-            プロフィール更新
-        </Link>
-      </div>
     </div>
       
   );
