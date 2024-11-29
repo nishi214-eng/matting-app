@@ -31,8 +31,8 @@ const Chat: React.FC = () => {
             >
                 <LocalPhoneIcon/>
             </Button>
-            {user && !roomName &&
-                <ChatLogView partnerName={partnerName}/>
+            {user && !roomName && user.displayName &&
+                <ChatLogView partnerName={partnerName} userName={user.displayName}/>
             }
             {!user &&
                 <h1>
