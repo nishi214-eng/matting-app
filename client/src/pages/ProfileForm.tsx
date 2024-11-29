@@ -327,7 +327,7 @@ const ProfileForm: React.FC = () => {
                 </Select>
             </FormControl>
             <br />
-            <Button variant = "contained" type = "submit">送信</Button>
+            <Button variant = "contained" type = "submit">登録</Button>
             <NaviButtons/>
         </form>
         </Box>

@@ -56,6 +56,8 @@ const ProfileChange: React.FC = () => {
     const [image2, setImage2] = useState<File | null>(null);//アイコンイメージ
     const [imageUrl, setImageUrl] = useState<string | null>(null);//仮置き、入力されたアイコン画像
     const [imageUrl2, setImageUrl2] = useState<string | null>(null);//仮置き、入力されたアイコン画像
+    const [preImage, setPreImage] = useState<string | "">("");//変更前のユーザーのアイコン
+    const [preImage2, setPreImage2] = useState<string | "">("");//変更前のユーザーのアイコン
 
     //登録者自身のプロフィールを取得してデータに格納
     useEffect(() => {
@@ -67,6 +69,8 @@ const ProfileChange: React.FC = () => {
             const querySnapshot = await getDoc(dataDocRef);
             const profilesData: Profile = querySnapshot.data() as Profile;
             setProfile(profilesData);
+            setPreImage(profilesData.userImage);
+            setPreImage2(profilesData.userImage2);
         };
         
         fetchProfiles();
@@ -221,6 +225,12 @@ const ProfileChange: React.FC = () => {
                     <Button onClick={handleReset} variant="outlined">Reset</Button>
                 </div>
             )}
+            {(!imageUrl && preImage != "") && (
+                <div>
+                    <img src={preImage} alt="selected" style={{ height: '300px', width: '300px' }} />
+                    <Typography variant="caption" component="div" gutterBottom>変更前のアイコン</Typography>
+                </div>
+            )}
             <Typography variant="body1" component="h6" mt={1} gutterBottom>アイコン画像2・選択</Typography>
             <MuiFileInput value={image2} onChange={handleSetImage4} variant="outlined" sx={{ m: 1, minWidth: 120, width: 250 }} />
             <br />
@@ -232,6 +242,12 @@ const ProfileChange: React.FC = () => {
                 <div>
                     <img src={imageUrl2} alt="selected" style={{ height: '300px', width: '300px' }} />
                     <Button onClick={handleReset2} variant="outlined">Reset</Button>
+                </div>
+            )}
+            {(!imageUrl2 && preImage2 != "") && (
+                <div>
+                    <img src={preImage2} alt="selected" style={{ height: '300px', width: '300px' }} />
+                    <Typography variant="caption" component="div" gutterBottom>変更前のアイコン2</Typography>
                 </div>
             )}
 
@@ -323,7 +339,7 @@ const ProfileChange: React.FC = () => {
                 </Select>
             </FormControl>
             <br />
-            <Button variant = "contained" type = "submit">送信</Button>
+            <Button variant = "contained" type = "submit">更新</Button>
             <NaviButtons/>
         </form>
         </Box>
