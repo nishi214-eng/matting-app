@@ -126,7 +126,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName},{userName}) => {
               color: "#333",
           }}
       >
-        {'相手の名前'}
+        {partnerName}
       </Typography>
       <Paper
         id="outer_chatLogView"
