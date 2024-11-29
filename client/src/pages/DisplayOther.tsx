@@ -23,15 +23,16 @@ interface Profile {
   firstSon : string |  "";
 };
 
-const ProfileDisplay: React.FC = () => {
-  const {user} = useAuthContext(); 
-  //プロフィール
-  const [profile, setProfile] = useState<Profile>({nickName: user?.displayName as string, gender :  "", age: "", height :  "",
-    userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
-    drinking :  "", marriageWant :  "", firstSon :  ""});
+const DisplayOther: React.FC = () => {
+    //他ユーザの名前を受け取る。この人を表示することになる
+    const otherUserName = "もも"; 
+    //プロフィール
+    const [profile, setProfile] = useState<Profile>({nickName: otherUserName, gender :  "", age: "", height :  "",
+        userImage: "", userImage2: "",origin: "", hobby: "" , drive :  "", annualIncome :  "", smoking :  "",
+        drinking :  "", marriageWant :  "", firstSon :  ""});
 
-  //DBからもらってきてデータを格納し、画面をレンダリング
-  useEffect(() => {
+    //DBからもらってきてデータを格納し、画面をレンダリング
+    useEffect(() => {
     const fetchProfiles = async () => {
         // profiles コレクション内の profileNickName ドキュメントを参照
         const profileDocRef = doc(db, "profiles", profile.nickName);
@@ -43,15 +44,15 @@ const ProfileDisplay: React.FC = () => {
     };
     
     fetchProfiles();
-  }, []);
+    }, []);
 
-  //フォームの選択肢の入力があった場合
-  const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
+    //フォームの選択肢の入力があった場合
+    const handleChange = (e : React.ChangeEvent<HTMLInputElement>) => {
     const { id, value } = e.target;
     setProfile({...profile, [id] : value});
-  };
+    };
 
-  return(
+    return(
     <div>
       <Box sx={{
             maxWidth: "600px",
@@ -209,4 +210,4 @@ const ProfileDisplay: React.FC = () => {
 };
 
 
-export default ProfileDisplay;
+export default DisplayOther;
