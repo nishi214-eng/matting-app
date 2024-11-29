@@ -106,7 +106,7 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
   const navigate = useNavigate();  // useNavigate を呼び出し
 
   const handleNavigate = () => {
-    navigate('/DisplayOther');  // "/bell" ページに遷移
+    navigate(`/DisplayOther`, { state: { partnerName: partnerName}})
   };
 
   return (
