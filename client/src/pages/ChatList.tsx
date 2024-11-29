@@ -106,7 +106,7 @@ function ChatList() {
                     <ListItem
                         key={chat.id}
                         alignItems="flex-start"
-                        onClick={() => navigate(`/chat`)} // 個別チャットページへの遷移navigate(`/chat/${chat.id}`)} 
+                        onClick={() => navigate(`/chat`, { state: { partnerName: chat.name } })} // 個別チャットページへの遷移navigate(`/chat/${chat.id}`)} 
                         sx={{
                             borderRadius: "8px",
                             "&:hover": {
