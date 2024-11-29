@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { db } from "../infra/firebase";
-import { doc, setDoc, getDoc } from "firebase/firestore";
+import { doc, setDoc, getDoc, collection } from "firebase/firestore";
 import {uploadFile} from "../feature/uploadFile";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
@@ -132,13 +132,16 @@ const ProfileForm: React.FC = () => {
                     console.log('Image uploaded successfully:', url2);
                     setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
                 }
-                // profiles コレクション内の profileNickName ドキュメントを参照
+                // 親ドキュメントの参照を取得
                 const profileDocRef = doc(db, "profiles", profile.nickName);
 
-                // そのドキュメント内の "profile" サブコレクションの "data" ドキュメントを参照
-                const dataDocRef = doc(profileDocRef, "profile", "data");
+                // 親ドキュメントを作成
+                await setDoc(profileDocRef, {}); // 必要に応じて初期データを設定
 
-                // "data" ドキュメントに profile のデータをセット
+                // "profile" サブコレクションの "data" ドキュメントの参照を取得
+                const dataDocRef = doc(collection(profileDocRef, "profile"), "data");
+
+                // "data" ドキュメントに profile のデータを設定
                 await setDoc(dataDocRef, profile);
 
                 console.log('Profile saved successfully');
