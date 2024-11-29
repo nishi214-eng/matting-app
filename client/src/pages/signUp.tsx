@@ -9,10 +9,10 @@ import IconButton from '@mui/material/IconButton';
 import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility } from "@mui/icons-material";
 import { VisibilityOff } from "@mui/icons-material";
-
 import { AlertContext } from '../store/useSnackber';
 import { useContext } from 'react';
 
+import { FileUploadForm } from "../components/FileUploadForm"; // FileUploadForm コンポーネントをインポート
 import "../style/auth.css";
 
 interface SignupForm {
@@ -23,7 +23,8 @@ interface SignupForm {
 
 export default function SignUp(){
     const { showAlert } = useContext(AlertContext);
-  
+    const [isSubmitted, setIsSubmitted] = useState(false); // サインアップが完了したかどうかの状態
+
     // React Hook Formの使用
     const { register, handleSubmit, formState: { errors }, getValues, trigger } = useForm<SignupForm>(); // useForm関数をLoginForm型で呼び出す
     // 送信時の処理
@@ -44,6 +45,8 @@ export default function SignUp(){
                     "success",
                     `${email}宛てに確認メールを送信しました。メールボックスを確認してください。`
                 );
+              // サインアップ成功後、フォーム送信完了としてマーク
+              setIsSubmitted(true); 
 
         } catch (error) {
             console.log(error);
@@ -236,6 +239,9 @@ export default function SignUp(){
               </div>
             </form>
           </div>
+
+          {/* サインアップが完了したらファイルアップロードフォームを表示 */}
+          {isSubmitted && <FileUploadForm uploadType="license" />}
         </section>
       </div>
     )
