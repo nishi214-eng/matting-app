@@ -41,14 +41,14 @@ const formatHHMM = (time: Date) => {
 
 interface ChatLogViewProps {
   partnerName: string;
+  userName:string
 }
 
-const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
+const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName},{userName}) => {
   const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
   const [inputMsg, setInputMsg] = useState('');
 
   const { user } = useAuthContext();
-  const userName = '佐藤次郎';
   const sortNameArray = sortName(partnerName, userName);
   const chatRoomName = sortNameArray[0] + '_' + sortNameArray[1];
   let chatRef = collection(db, 'chatroom', chatRoomName, 'messages');
