@@ -104,6 +104,8 @@ const ProfileForm: React.FC = () => {
         const profileDoc = await getDoc(profileDocRef);
         if(profileDoc.exists()){
             alert("そのニックネームは既に使用されています");
+        }else if(profile.nickName == ""){
+            alert("ニックネームを入力してください");
         }else{
             //try以下を追加
             try {
@@ -121,14 +123,14 @@ const ProfileForm: React.FC = () => {
                 }
                 //イメージのアップロードがあるなら
                 if(image){
-                    const url = await uploadFile(image, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
+                    const url = await uploadFile(image, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
                     console.log('Image uploaded successfully:', url);
                     setProfile({...profile, userImage : url as string});//結果のURLをプロフィールに追加
                 }
                 if(image2){
-                    const url = await uploadFile(image2, user?.email as string, 'profile'); // features/uploadFile.tsの関数を使用
-                    console.log('Image uploaded successfully:', url);
-                    setProfile({...profile, userImage2 : url as string});//結果のURLをプロフィールに追加
+                    const url2 = await uploadFile(image2, profile.nickName, 'profile'); // features/uploadFile.tsの関数を使用
+                    console.log('Image uploaded successfully:', url2);
+                    setProfile({...profile, userImage2 : url2 as string});//結果のURLをプロフィールに追加
                 }
                 // profiles コレクション内の profileNickName ドキュメントを参照
                 const profileDocRef = doc(db, "profiles", profile.nickName);
@@ -170,10 +172,11 @@ const ProfileForm: React.FC = () => {
                 プロフィール編集
             </Typography>
         <form onSubmit={handleSubmit}>
-            <TextField id="nikcName" label="ニックネーム" value={profile.nickName}
+            <TextField id="nikcName" label="ニックネーム" value={profile.nickName} sx={{ m: 1, minWidth: 120, width: 250 }} size="small"
                 onChange={(event: React.ChangeEvent<HTMLInputElement>) => { setProfile({...profile, nickName : event.target.value});}}
             />
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="gender-select-small-label">性別</InputLabel>
                 <Select
                     labelId="gender-select-small-label" name="gender" value={profile.gender} label="Gender"
@@ -184,7 +187,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="age-select-small-label">年齢</InputLabel>
                 <Select
                     labelId="age-select-small-label" name="age" value={profile.age} label="Age"
@@ -195,7 +199,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="height-select-small-label">身長</InputLabel>
                 <Select
                     labelId="height-select-small-label" name="height" value={profile.height} label="Hright"
@@ -206,9 +211,9 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-
+            <br />
             <Typography variant="body1" component="h6" mt={1} gutterBottom>アイコン画像1・選択</Typography>
-            <MuiFileInput value={image} onChange={handleSetImage3} variant="outlined" />
+            <MuiFileInput value={image} onChange={handleSetImage3} variant="outlined" sx={{ m: 1, minWidth: 120, width: 250 }} />
             <br />
             <Typography variant="caption" component="div" gutterBottom>PNG/JPEG/GIF ファイルのみ、ファイルサイズは5MB以内。</Typography>
             {(image) && !(image.type === "image/png" || image.type === "image/jpeg" || image.type === "image/gif") && (
@@ -217,12 +222,11 @@ const ProfileForm: React.FC = () => {
             {imageUrl && (
                 <div>
                     <img src={imageUrl} alt="selected" style={{ height: '300px', width: '300px' }} />
-                    <button onClick={handleReset}>Reset</button>
+                    <Button onClick={handleReset} variant="outlined">Reset</Button>
                 </div>
             )}
-
             <Typography variant="body1" component="h6" mt={1} gutterBottom>アイコン画像2・選択</Typography>
-            <MuiFileInput value={image2} onChange={handleSetImage4} variant="outlined" />
+            <MuiFileInput value={image2} onChange={handleSetImage4} variant="outlined" sx={{ m: 1, minWidth: 120, width: 250 }} />
             <br />
             <Typography variant="caption" component="div" gutterBottom>PNG/JPEG/GIF ファイルのみ、ファイルサイズは5MB以内。</Typography>
             {(image2) && !(image2.type === "image/png" || image2.type === "image/jpeg" || image2.type === "image/gif") && (
@@ -231,11 +235,11 @@ const ProfileForm: React.FC = () => {
             {imageUrl2 && (
                 <div>
                     <img src={imageUrl2} alt="selected" style={{ height: '300px', width: '300px' }} />
-                    <button onClick={handleReset2}>Reset</button>
+                    <Button onClick={handleReset2} variant="outlined">Reset</Button>
                 </div>
             )}
 
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="prefecture-select-small-label">出身</InputLabel>
                 <Select
                     labelId="prefecture-select-small-label" name="origin" value={profile.origin} label="Origin"
@@ -246,10 +250,12 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <TextField id="hobby" label="趣味" value={profile.hobby}
+            <br />
+            <TextField id="hobby" label="趣味" value={profile.hobby} sx={{ m: 1, minWidth: 120, width: 250 }} size="small"
                  onChange={(event: React.ChangeEvent<HTMLInputElement>) => { setProfile({...profile, hobby : event.target.value});}}
                 />
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="drive-select-small-label">運転するか</InputLabel>
                 <Select
                     labelId="drive-select-small-label" name="drive" value={profile.drive} label="Drive"
@@ -260,7 +266,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="annualIncome-select-small-label">年収</InputLabel>
                 <Select
                     labelId="annualIncome-select-small-label" name="annualIncome" value={profile.annualIncome} label="AnnualIncome"
@@ -271,7 +278,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="smoking-select-small-label">喫煙</InputLabel>
                 <Select
                     labelId="smoking-select-small-label" name="smoking" value={profile.smoking} label="smoking"
@@ -282,7 +290,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="drinking-select-small-label">飲酒</InputLabel>
                 <Select
                     labelId="drinking-select-small-label" name="drinking" value={profile.drinking} label="drinking"
@@ -293,7 +302,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="marriageWant-select-small-label">結婚願望</InputLabel>
                 <Select
                     labelId="marriageWant-select-small-label" name="marriageWant" value={profile.marriageWant} label="marriageWant"
@@ -304,7 +314,8 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
-            <FormControl sx={{ m: 1, minWidth: 120 }} size="small">
+            <br />
+            <FormControl sx={{ m: 1, minWidth: 120, width: 250 }} size="small">
                 <InputLabel id="firstSon-select-small-label">長男かどうか</InputLabel>
                 <Select
                     labelId="firstSon-select-small-label" name="firstSon" value={profile.firstSon} label="firstSon"
@@ -315,6 +326,7 @@ const ProfileForm: React.FC = () => {
                     ))}
                 </Select>
             </FormControl>
+            <br />
             <Button variant = "contained" type = "submit">送信</Button>
             <NaviButtons/>
         </form>
