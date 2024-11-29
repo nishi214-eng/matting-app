@@ -10,6 +10,9 @@ import InputAdornment from '@mui/material/InputAdornment';
 import { Visibility } from "@mui/icons-material";
 import { VisibilityOff } from "@mui/icons-material";
 
+import { AlertContext } from '../store/useSnackber';
+import { useContext } from 'react';
+
 import "../style/auth.css";
 
 interface SignupForm {
@@ -19,7 +22,7 @@ interface SignupForm {
 }
 
 export default function SignUp(){
-     //const { showAlert } = useContext(AlertContext);
+    const { showAlert } = useContext(AlertContext);
   
     // React Hook Formの使用
     const { register, handleSubmit, formState: { errors }, getValues, trigger } = useForm<SignupForm>(); // useForm関数をLoginForm型で呼び出す
@@ -36,7 +39,7 @@ export default function SignUp(){
             };
             //ユーザ登録の確認メールを送信
                 sendEmailVerification(userCredential.user, actionCodeSettings);
-                // showAlert("success",`${email}宛てに確認メールを送信しました。メールボックスを確認してください。`);
+                showAlert(`${email}宛てに確認メールを送信しました。メールボックスを確認してください。`,"success");
                 console.log(
                     "success",
                     `${email}宛てに確認メールを送信しました。メールボックスを確認してください。`
