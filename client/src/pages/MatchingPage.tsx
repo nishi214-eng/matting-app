@@ -11,17 +11,8 @@ interface Candidate {
   nickName: string;
   gender: string | "";
   userImage: string | "";
-  userImage2: string | "";
   age: string | "";
-  height: string | "";
   origin: string | "";
-  hobby: string;
-  drive: string | "";
-  annualIncome: string | "";
-  smoking: string | "";
-  drinking: string | "";
-  marriageWant: string | "";
-  firstSon: string | "";
 }
 
 const MatchingPage: React.FC = () => {
@@ -35,34 +26,25 @@ const MatchingPage: React.FC = () => {
     const [waitingCandidates, setWaitingCandidates] = useState<Candidate[]>([]); // マッチング待ちの候補者
     const [openSkipListDialog, setOpenSkipListDialog] = useState<boolean>(false); // スキップリストのダイアログの表示状態
     const [openMatchingListDialog, setOpenMatchingListDialog] = useState<boolean>(false); // マッチング待ちリストのダイアログの表示状態
-    const userNickName = user?.displayName
+    const userNickName = user?.displayName　as string
 
   // ユーザーと候補者のデータを取得
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return; // ログインしていない場合、処理を終了
       try {
-        const profileDocRef = doc(db, "profiles", user.uid, "profile", "data"); // user.uidを使ってユーザーのプロフィールを取得
+        const profileDocRef = doc(db, "profiles", userNickName, "profile", "data"); // userNickNameを使ってユーザーのプロフィールを取得
         const profileDoc = await getDoc(profileDocRef);
 
         if (profileDoc.exists()) {
           const profileData = profileDoc.data();
           setUserProfile({
-            id: user.uid,
+            id: userNickName,
             nickName: profileData.nickName,
             gender: profileData.gender || "",
             userImage: profileData.userImage || "",
-            userImage2: profileData.userImage2 || "",
             age: profileData.age || "",
-            height: profileData.height || "",
             origin: profileData.origin || "",
-            hobby: profileData.hobby || "",
-            drive: profileData.drive || "",
-            annualIncome: profileData.annualIncome || "",
-            smoking: profileData.smoking || "",
-            drinking: profileData.drinking || "",
-            marriageWant: profileData.marriageWant || "",
-            firstSon: profileData.firstSon || "",
           });
         } else {
           console.error("User profile not found");
@@ -83,7 +65,7 @@ const MatchingPage: React.FC = () => {
         for (const docSnapshot of querySnapshot.docs) {
           const candidateId = docSnapshot.id;
 
-          if (candidateId !== user.uid) { // 自分自身はスキップ
+          if (candidateId !== userNickName) { // 自分自身はスキップ
             const profileDocRef = doc(db, "profiles", candidateId, "profile", "data");
             const profileDoc = await getDoc(profileDocRef);
 
@@ -94,28 +76,19 @@ const MatchingPage: React.FC = () => {
                 nickName: profileData.nickName,
                 gender: profileData.gender || "",
                 userImage: profileData.userImage || "",
-                userImage2: profileData.userImage2 || "",
                 age: profileData.age || "",
-                height: profileData.height || "",
                 origin: profileData.origin || "",
-                hobby: profileData.hobby || "",
-                drive: profileData.drive || "",
-                annualIncome: profileData.annualIncome || "",
-                smoking: profileData.smoking || "",
-                drinking: profileData.drinking || "",
-                marriageWant: profileData.marriageWant || "",
-                firstSon: profileData.firstSon || "",
               };
 
               // マッチング済みまたはスキップした相手はリストに追加しない
               const matchedListSnapshot = await getDocs(collection(db, "profiles", candidateId, "mattingList"));
-              const isMatched = matchedListSnapshot.docs.some(doc => doc.id === user.uid);
+              const isMatched = matchedListSnapshot.docs.some(doc => doc.id === userNickName);
 
               if (isMatched) {
                 setMatchedCandidate(candidate);
               } else {
                 // スキップした候補者
-                const skipListSnapshot = await getDocs(collection(db, "profiles", user.uid, "skipList"));
+                const skipListSnapshot = await getDocs(collection(db, "profiles", userNickName, "skipList"));
                 const isSkipped = skipListSnapshot.docs.some(doc => doc.id === candidateId);
                 if (isSkipped) {
                   skippedList.push(candidate);
@@ -156,11 +129,11 @@ const MatchingPage: React.FC = () => {
 
     try {
       await addDoc(collection(db, "profiles", matched.id, "mattingList"), {
-        id: user.uid,
+        id: userNickName,
         nickName: userProfile.nickName, // Only store nickName
       });
 
-      await addDoc(collection(db, "profiles", user.uid, "mattingList"), {
+      await addDoc(collection(db, "profiles", userNickName, "mattingList"), {
         id: matched.id,
         nickName: matched.nickName, // Only store nickName
       });
@@ -185,7 +158,7 @@ const MatchingPage: React.FC = () => {
 
     try {
       // スキップした候補者をスキップリストに追加
-      await addDoc(collection(db, "profiles", user.uid, "skipList"), {
+      await addDoc(collection(db, "profiles", userNickName, "skipList"), {
         id: skipped.id,
         nickName: skipped.nickName,
       });
