@@ -6,7 +6,8 @@ import { sendPasswordResetEmail } from "firebase/auth";
 import { TextField, Button } from "@mui/material";
 import { signOut } from "firebase/auth";
 import { Link, Navigate } from "react-router-dom";
-
+import { AlertContext } from '../store/useSnackber';
+import { useContext } from 'react';
 
 import "../style/auth.css";
 
@@ -15,7 +16,7 @@ interface ResetPasswordForm {
 }
 
 export const ResetPassword = () => {
-    //const { showAlert } = useContext(AlertContext);
+    const { showAlert } = useContext(AlertContext);
   
     // React Hook Formの使用
     const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordForm>(); // useForm関数をLoginForm型で呼び出す
@@ -34,7 +35,7 @@ export const ResetPassword = () => {
       }
       try{
         sendPasswordResetEmail(auth, email, actionCodeSettings)
-        console.log(`${email}にメールを送信しました`)
+        showAlert(`${email}にメールを送信しました。`,"success");
       }catch(error){
         console.log(error)
       }

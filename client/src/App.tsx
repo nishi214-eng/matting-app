@@ -11,6 +11,7 @@ import Chat from './pages/Chat';
 import Home from './pages/MatchingPage';
 import { AuthProvider } from './store/AuthContext';
 import { AlertProvider } from './store/useSnackber';
+import DisplayOther from './pages/DisplayOther';
 
 function App() {
   return (
@@ -28,7 +29,8 @@ function App() {
               <Route path="/ChatList" element={<ChatList />} />
               <Route path="/Chat" element={<Chat/>} />
               <Route path="/ProfileForm" element={<ProfileForm />} />
-              <Route path="/ProfileDisplay" element={<ProfileDisplay />} />
+              <Route path="/ProfileDisplay" element={<ProfileDisplay />}/>
+              <Route path="/DisplayOther" element={<DisplayOther/>}/>
               <Route path="*" element={<h1>Not Found Page</h1>} />
             </Routes>
           </AlertProvider>

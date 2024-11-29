@@ -15,6 +15,7 @@ import {
 import { useAuthContext } from '../store/AuthContext';
 import { sortName } from '../feature/sortName';
 import NaviButtons from './NavigationButtons';
+import { useNavigate } from 'react-router-dom';
 
 import {
   TextField,
@@ -43,12 +44,12 @@ interface ChatLogViewProps {
   partnerName: string;
 }
 
-const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
+const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
   const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
   const [inputMsg, setInputMsg] = useState('');
 
   const { user } = useAuthContext();
-  const userName = '佐藤次郎';
+  const userName = user?.displayName as string;
   const sortNameArray = sortName(partnerName, userName);
   const chatRoomName = sortNameArray[0] + '_' + sortNameArray[1];
   let chatRef = collection(db, 'chatroom', chatRoomName, 'messages');
@@ -102,6 +103,12 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
     }
   }, []);
 
+  const navigate = useNavigate();  // useNavigate を呼び出し
+
+  const handleNavigate = () => {
+    navigate(`/DisplayOther`, { state: { partnerName: partnerName}})
+  };
+
   return (
 
     <Paper
@@ -116,18 +123,23 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName }) => {
       }}
     >
 
-      <Typography
-          variant="h5"
-          gutterBottom
-          sx={{
-              textAlign: "center",
-              marginBottom: "16px",
-              fontWeight: "bold",
-              color: "#333",
-          }}
-      >
-        {'相手の名前'}
-      </Typography>
+    <Button
+      variant="text"
+      onClick={handleNavigate}
+      sx={{
+        textAlign: 'center',
+        marginBottom: 2,
+        fontWeight: 'bold',
+        color: '#333',
+        padding: 0,
+        textTransform: 'none', 
+        '&:hover': {
+          backgroundColor: 'transparent',  // ホバー時に背景色が変わらないように設定
+        }
+      }}
+    >
+      {partnerName}
+    </Button>
       <Paper
         id="outer_chatLogView"
         sx={{

@@ -4,6 +4,8 @@ import { db } from "../infra/firebase";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
+import { AlertContext } from '../store/useSnackber';
+import { useContext } from 'react';
 
 interface Candidate {
   id: string;
@@ -28,11 +30,14 @@ const MatchingPage: React.FC = () => {
   const userNickName = user?.displayName as string;
   const [userGender, setUserGender] = useState<string | "">("");
 
+    const { showAlert } = useContext(AlertContext);
+  // ユーザーと候補者のデータを取得
   useEffect(() => {
     const fetchUserProfile = async () => {
       if (!user) return;
       try {
-        const profileDocRef = doc(db, "profiles", userNickName, "profile", "data");
+
+        const profileDocRef = doc(db, "profiles", userNickName, "profile", "data"); // userNickNameを使ってユーザーのプロフィールを取得
         const profileDoc = await getDoc(profileDocRef);
         if (profileDoc.exists()) {
           const profileData = profileDoc.data();
@@ -67,6 +72,7 @@ const MatchingPage: React.FC = () => {
     
         for (const docSnapshot of querySnapshot.docs) {
           const candidateId = docSnapshot.id;
+          
           if (candidateId !== userNickName && !matchedCandidates.includes(candidateId)) {
             const profileDocRef = doc(db, "profiles", candidateId, "profile", "data");
             const profileDoc = await getDoc(profileDocRef);
@@ -80,6 +86,7 @@ const MatchingPage: React.FC = () => {
                 age: profileData.age || "",
                 origin: profileData.origin || "",
               };
+
     
               const skipListSnapshot = await getDocs(collection(db, "profiles", userNickName, "skipList"));
               const isSkipped = skipListSnapshot.docs.some(doc => doc.id === candidateId);
@@ -112,7 +119,7 @@ const MatchingPage: React.FC = () => {
     if (currentIndex + 1 < candidates.length) {
       setCurrentIndex(prevIndex => prevIndex + 1);
     } else {
-      alert("候補者がいません！");
+      showAlert(`候補者がいません！`,"error");
     }
   };
 
@@ -123,13 +130,15 @@ const MatchingPage: React.FC = () => {
     try {
       await addDoc(collection(db, "profiles", matched.id, "mattingList"), {
         id: userNickName,
-        nickName: userProfile.nickName,
+
+        nickName: userProfile.nickName, // Only store nickName
       });
+
       await addDoc(collection(db, "profiles", userNickName, "mattingList"), {
         id: matched.id,
         nickName: matched.nickName,
       });
-      alert(`${matched.nickName}にいいねしました！`);
+      showAlert(`${matched.nickName}にいいねしました！`,"success");
       setMatchedCandidate(matched);
       setCandidates(prevCandidates =>
         prevCandidates.filter(candidate => candidate.id !== matched.id)
@@ -137,7 +146,7 @@ const MatchingPage: React.FC = () => {
       fetchNextCandidate();
     } catch (error) {
       console.error("Error adding to matching list: ", error);
-      alert("マッチングリストへの追加中にエラーが発生しました。再試行してください。");
+      showAlert(`マッチングリストへの追加中にエラーが発生しました。再試行してください。`,"error");
     }
   };
 
@@ -146,14 +155,14 @@ const MatchingPage: React.FC = () => {
     const skipped = candidates[currentIndex];
 
     try {
+
       await addDoc(collection(db, "profiles", userNickName, "skipList"), {
         id: skipped.id,
         nickName: skipped.nickName,
       });
       fetchNextCandidate();
     } catch (error) {
-      console.error("Error skipping candidate: ", error);
-      alert("候補者をスキップできませんでした。再試行してください。");
+      showAlert(`候補者をスキップできませんでした。再試行してください。`,"error");
     }
   };
 

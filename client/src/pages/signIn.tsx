@@ -35,13 +35,25 @@ export const SignIn = () => {
   
       try {
         // サインインの実行
-        await signInWithEmailAndPassword(auth, email, password);
-        // 次ページに遷移  
-        navigate("/ChatList")
+        signInWithEmailAndPassword(auth, email, password)
+          .then((userCredential) => {
+            // Signed in 
+            const user = userCredential.user;
+            if(user.displayName){
+                // 次ページに遷移
+                navigate("/Home")
+            }else{
+                // 次ページに遷移
+                navigate("/ProfileForm")
+            }
+          })
+          .catch((error) => {
+            throw new Error(error);
+          });
 
-      } catch {
+      } catch (error){
         // エラー処理
-        console.log("エラーだよ！！！！！！！！！！！！！")
+        console.log(error)
         // showAlert("メールアドレスまたはパスワードが異なります。", "error");
       }
     };
