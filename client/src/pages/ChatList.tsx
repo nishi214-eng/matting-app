@@ -165,7 +165,7 @@ function ChatList() {
                     color: "#333",
                 }}
             >
-                トーク一覧
+                やり取り一覧
             </Typography>
             <List>
                 {chats.map((chat) => (
