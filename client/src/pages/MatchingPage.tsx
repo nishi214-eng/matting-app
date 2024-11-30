@@ -186,7 +186,7 @@ const MatchingPage: React.FC = () => {
           <CardMedia
             component="img"
             height="300"
-            image={candidates[currentIndex].userImage || "/images/default-profile.png"}
+            image={candidates[currentIndex].userImage  || "/images/noimage.png"}
             alt={candidates[currentIndex].nickName}
           />
           <CardContent>
