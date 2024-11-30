@@ -17,11 +17,12 @@
     "http-proxy-middleware": "^3.0.3",
     "jade": "~1.11.0",
     "morgan": "~1.9.1",
+    "mui-file-input": "^6.0.0",
     "nodemon": "^3.1.7",
-    "socket.io": "^4.8.1",
-    "mui-file-input": "^6.0.0"
+    "socket.io": "^4.8.1"
   },
   "devDependencies": {
-    "cross-env": "^7.0.3"
+    "cross-env": "^7.0.3",
+    "typescript": "^5.7.2"
   }
 }
