@@ -1,11 +1,14 @@
+
 import React, { useState, useEffect } from "react";
-import { Box, Typography, Button, Card, CardMedia, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle } from "@mui/material";
+import { Box, Typography, Button, Card, CardMedia, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,IconButton } from "@mui/material";
 import { db } from "../infra/firebase";
 import { collection, getDocs, doc, getDoc, addDoc } from "firebase/firestore";
 import { useAuthContext } from '../store/AuthContext';
 import NaviButtons from '../components/NavigationButtons';
 import { AlertContext } from '../store/useSnackber';
 import { useContext } from 'react';
+import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
+import ReplyIcon from '@mui/icons-material/Reply';
 
 interface Candidate {
   id: string;
@@ -173,34 +176,7 @@ const MatchingPage: React.FC = () => {
   const handleCloseMatchingListDialog = () => setOpenMatchingListDialog(false);
 
   return (
-    <Box sx={{ maxWidth: "800px", margin: "0 auto", padding: "16px", textAlign: "center", position: "relative" }}>
-      <Box sx={{ display: "flex", justifyContent: "space-between", marginBottom: 2 }}>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#f44336", // Skipボタン色
-            color: "#fff",
-            "&:hover": { backgroundColor: "#d32f2f" },
-            width: "48%",
-          }}
-          onClick={handleOpenSkipListDialog}
-        >
-          スキップリスト
-        </Button>
-        <Button
-          variant="contained"
-          sx={{
-            backgroundColor: "#4caf50", // Matchボタン色
-            color: "#fff",
-            "&:hover": { backgroundColor: "#388e3c" },
-            width: "48%",
-          }}
-          onClick={handleOpenMatchingListDialog}
-        >
-          マッチング待ちリスト
-        </Button>
-      </Box>
-
+    <Box sx={{ maxWidth: "800px", margin: "0 auto", padding: "16px", textAlign: "center"}}>
       {loading ? (
         <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
           <CircularProgress />
@@ -217,30 +193,74 @@ const MatchingPage: React.FC = () => {
             <Typography variant="h5">{candidates[currentIndex].nickName}</Typography>
             <Typography variant="body2">{candidates[currentIndex].age}歳</Typography>
             <Typography variant="body2">{candidates[currentIndex].origin}</Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+              <IconButton
+                size="large"
+                sx={{
+                  color: '#FF6F6F', // サムズアップアイコンの色を淡い赤に変更
+                  '&:hover': {
+                    color: '#FF3D3D', // ホバー時の色をもう少し濃い赤に変更
+                  },
+                }}
+                onClick={handleMatch}
+              >
+                <ThumbUpAltIcon fontSize="inherit"/>
+              </IconButton>
+
+              <IconButton
+                size="large"
+                sx={{
+                  color: '#6EC1E4', // スキップアイコンの色を淡い青に変更
+                  '&:hover': {
+                    color: '#4DA9D7', // ホバー時の色を少し濃い青に変更
+                  },
+                }}
+                onClick={handleSkip}
+              >
+
+                  <ReplyIcon fontSize="inherit"/>
+                </IconButton>
+              </Box>
           </CardContent>
         </Card>
       ) : (
         <Typography variant="h6">候補者が見つかりませんでした。</Typography>
       )}
+      <Box sx={{ width:"100%",marginBottom: "16px",display: 'flex', flexDirection: 'column', gap: '6px' }}>
+        <Button
+              variant="contained"
+              type="submit"
+              sx={{
+                width: "100%",
+                borderRadius: "1%",
+                backgroundColor: "#96C78C",
+                boxShadow: "none",
+                '&:hover': {
+                  backgroundColor: "98C78C",
+                },
+              }}
+              onClick={handleOpenSkipListDialog}
+          >
+            スキップリスト
+          </Button>
+          <Button 
+            variant="contained"
+            type="submit"
+            sx={{
+              width: "100%",
+              borderRadius: "1%",
+              backgroundColor: "#96C78C",
+              boxShadow: "none",
+              '&:hover': {
+                backgroundColor: "98C78C",
+              },
+            }}
+            onClick={handleOpenMatchingListDialog}
+          >
+            マッチング待ちリスト
+          </Button>
+        </Box>
 
-      <Box sx={{ display: "flex", justifyContent: "center", gap: "16px" }}>
-        <Button
-          variant="contained"
-          color="error"
-          sx={{ width: "48%" }}
-          onClick={handleSkip}
-        >
-          スキップ
-        </Button>
-        <Button
-          variant="contained"
-          color="success"
-          sx={{ width: "48%" }}
-          onClick={handleMatch}
-        >
-          いいね！
-        </Button>
-      </Box>
 
       <Dialog open={openSkipListDialog} onClose={handleCloseSkipListDialog} maxWidth="sm" fullWidth>
         <DialogTitle>スキップリスト</DialogTitle>

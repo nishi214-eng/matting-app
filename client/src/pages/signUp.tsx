@@ -41,10 +41,6 @@ export default function SignUp(){
             //ユーザ登録の確認メールを送信
                 sendEmailVerification(userCredential.user, actionCodeSettings);
                 showAlert(`${email}宛てに確認メールを送信しました。メールボックスを確認してください。`,"success");
-                console.log(
-                    "success",
-                    `${email}宛てに確認メールを送信しました。メールボックスを確認してください。`
-                );
               // サインアップ成功後、フォーム送信完了としてマーク
               setIsSubmitted(true); 
 
@@ -67,18 +63,19 @@ export default function SignUp(){
         <div className="form_container">
         <section className="form_wrapper">
           <div className="form_outer">
-  
+            <img src="/images/logp.jpg" alt="ロゴ" 
+              width="100%"
+              height="auto"      
+            />
             <form onSubmit={handleSubmit(onSubmit)} aria-label="サインアップフォーム">
               <fieldset className="input_section">
                 <div className="input_subsection">
-                  <label htmlFor="email" className="subsection_title">
-                    メールアドレス
-                  </label>
                   <div className="text_field">
                     <TextField
                       id="email"
                       fullWidth
                       variant="outlined"
+                      placeholder="メールアドレス"
                       sx={{
                         backgroundColor: "white",
                         '& .MuiInputBase-input': {
@@ -104,12 +101,10 @@ export default function SignUp(){
                 </div>
   
                 <div className="input_subsection">
-                  <label htmlFor="password" className="subsection_title">
-                    パスワード
-                  </label>
                   <div className="text_field">
                   <TextField
                     id="password"
+                    placeholder="パスワード"
                     type={showPassword ? "password":"text"}
                     fullWidth
                       variant="outlined"
@@ -165,13 +160,11 @@ export default function SignUp(){
                 </div>
 
                 <div className="input_subsection">
-                  <label htmlFor="password_confirmation" className="subsection_title">
-                    パスワードの確認
-                  </label>
                   <div className="text_field">
                   <TextField
                     id="password_confirmation"
                     type={"text"}
+                    placeholder="パスワードの確認"
                     fullWidth
                       variant="outlined"
                       sx={{
