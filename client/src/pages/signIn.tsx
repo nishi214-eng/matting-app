@@ -71,18 +71,20 @@ export const SignIn = () => {
       <div className="form_container">
         <section className="form_wrapper">
           <div className="form_outer">
-  
+            <img src="/images/logp.jpg" alt="ロゴ" 
+              width="100%"
+              height="auto"      
+            />
+
             <form onSubmit={handleSubmit(onSubmit)} aria-label="ログインフォーム">
               <fieldset className="input_section">
                 <div className="input_subsection">
-                  <label htmlFor="email" className="subsection_title">
-                    メールアドレス
-                  </label>
                   <div className="text_field">
                     <TextField
                       id="email"
                       fullWidth
                       variant="outlined"
+                      placeholder="メールアドレス"
                       sx={{
                         backgroundColor: "white",
                         '& .MuiInputBase-input': {
@@ -108,13 +110,11 @@ export const SignIn = () => {
                 </div>
   
                 <div className="input_subsection">
-                  <label htmlFor="password" className="subsection_title">
-                    パスワード
-                  </label>
                   <div className="text_field">
                   <TextField
                     id="password"
                     type={showPassword ? "password":"text"}
+                    placeholder="パスワード"
                     fullWidth
                       variant="outlined"
                       sx={{

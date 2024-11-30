@@ -45,17 +45,18 @@ export const ResetPassword = () => {
       <div className="form_container">
         <section className="form_wrapper">
           <div className="form_outer">
-  
+            <img src="/images/logp.jpg" alt="ロゴ" 
+              width="100%"
+              height="auto"      
+            />
             <form onSubmit={handleSubmit(onSubmit)} aria-label="ログインフォーム">
               <fieldset className="input_section">
                 <div className="input_subsection">
-                  <label htmlFor="email" className="subsection_title">
-                    メールアドレス
-                  </label>
                   <div className="text_field">
                     <TextField
                       id="email"
                       fullWidth
+                      placeholder="メールアドレス"
                       variant="outlined"
                       sx={{
                         backgroundColor: "white",

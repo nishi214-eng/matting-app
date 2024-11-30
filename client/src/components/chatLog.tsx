@@ -27,6 +27,8 @@ import {
   InputAdornment
 } from '@mui/material';
 import { Send } from '@mui/icons-material';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+import VideoConnect from '../pages/VideoConnect';
 
 type ChatLog = {
   key: string;
@@ -108,131 +110,149 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
   const handleNavigate = () => {
     navigate(`/DisplayOther`, { state: { partnerName: partnerName}})
   };
-
+  const [roomName,setRoomName] = useState<string|null>(null);
+  const startTel = () => {
+    // userとmyNameの並びを一意にすることでchatRoomの名前を特定
+    if(user?.displayName){
+        const sortNameArray = sortName(partnerName,user?.displayName);
+        const chatRoomName = sortNameArray[0] + "_" + sortNameArray[1];
+        setRoomName(chatRoomName);
+    }
+  }
   return (
 
     <Paper
       id="wrapper_chatLog"
       sx={{
-          maxWidth: "600px",
-          margin: "0 auto",
-          padding: "16px",
-          backgroundColor: "#f7f7f7",
-          borderRadius: "16px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
+        maxWidth: '600px',
+        margin: '0 auto',
+        padding: '16px',
+        backgroundColor: '#f7f7f7',
+        borderRadius: '16px',
+        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
       }}
     >
-
-    <Button
-      variant="text"
-      onClick={handleNavigate}
-      sx={{
-        textAlign: 'center',
-        marginBottom: 2,
-        fontWeight: 'bold',
-        color: '#333',
-        padding: 0,
-        textTransform: 'none', 
-        '&:hover': {
-          backgroundColor: 'transparent',  // ホバー時に背景色が変わらないように設定
-        }
-      }}
-    >
-      {partnerName}
-    </Button>
-      <Paper
-        id="outer_chatLogView"
-        sx={{
-          width: '100%',
-          maxWidth: '580px',
-          padding: '10px',
-          backgroundColor: '#ffffff',
-          borderRadius: '8px',
-          boxShadow: 2,
-          marginBottom: '20px',
-          overflowY: 'auto',
-          maxHeight: '60vh',
-        }}
-      >
-
-        
-        {chatLogs.map((item) => (
+      {user && !roomName && user.displayName && (
+        <>
           <Box
-            key={item.key}
             sx={{
               display: 'flex',
-              flexDirection: userName === item.name ? 'row-reverse':'row',
-              alignItems: 'flex-start',
-              marginBottom: '10px',
+              justifyContent: 'space-between',
+              width: '100%',  // Ensure the container takes up full width
+              marginBottom: 2,  // Optional, to provide some space between the buttons and other elements
             }}
           >
-            <Paper
-              className={userName === item.name ? 'balloon_l' : 'balloon_r'}
+            <Button
+              variant="text"
+              onClick={handleNavigate}
               sx={{
-                padding: '10px',
-                maxWidth: '80%',
-                borderRadius: '16px',
-                backgroundColor: userName === item.name ? '#e1f5fe':'#e8f5e9',
+                fontWeight: 'bold',
+                color: '#333',
+                padding: 0,
+                textTransform: 'none',
+                '&:hover': {
+                  backgroundColor: 'transparent',
+                },
               }}
             >
-              <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                {item.name}
-              </Typography>
-              <Typography variant="body2" sx={{ wordWrap: 'break-word' }}>
-                {item.msg}
-              </Typography>
-              <Typography
-                variant="caption"
-                sx={{ color: 'gray', display: 'block', textAlign: 'right' }}
-              >
-                {formatHHMM(item.date)}
-              </Typography>
-            </Paper>
+              {partnerName}
+            </Button>
+            <Button onClick={startTel}>
+              <LocalPhoneIcon />
+            </Button>
           </Box>
-        ))}
-      </Paper>
 
-      <form
-        className="inputform"
-        onSubmit={async (e) => {
-          e.preventDefault();
-          await submitMsg();
-        }}
-        style={{ width: '100%', maxWidth: '600px' }}
-      >
-        <TextField
-          id="text"
-          type="text"
-          value={inputMsg}
-          onChange={(e) => setInputMsg(e.target.value)}
-          placeholder="メッセージを入力..."
-          fullWidth
-          variant="outlined"
-          InputProps={{
-            endAdornment: (
-              <InputAdornment position="end">
-                <IconButton
-                  aria-label="send-message"
-                  onClick={() => submitMsg()}
-                >
-                  <Send />
-                </IconButton>
-              </InputAdornment>
-            ),
-          }}
+        <Paper
+          id="outer_chatLogView"
           sx={{
-            backgroundColor: 'white',
-            '& .MuiOutlinedInput-root': {
-              borderRadius: '16px',
-            },
-            '& .MuiOutlinedInput-notchedOutline': {
-              borderColor: '#96C78C',
-            },
+            width: '90%',
+            padding: '5%',
+            backgroundColor: '#ffffff',
+            borderRadius: '8px',
+            boxShadow: 1,
+            marginBottom: '20px',
+            overflowY: 'auto',
+            minHeight: '60vh',
+            maxHeight: '60vh',
           }}
-        />
-            
-      </form>
-      <NaviButtons/>
+        >
+          {chatLogs.map((item) => (
+            <Box
+              key={item.key}
+              sx={{
+                display: 'flex',
+                flexDirection: userName === item.name ? 'row-reverse' : 'row',
+                alignItems: 'flex-start',
+                marginBottom: '10px',
+              }}
+            >
+              <Paper
+                className={userName === item.name ? 'balloon_l' : 'balloon_r'}
+                sx={{
+                  padding: '10px',
+                  maxWidth: '80%',
+                  borderRadius: '16px',
+                  backgroundColor: userName === item.name ? '#e1f5fe' : '#e8f5e9',
+                }}
+              >
+                <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
+                  {item.name}
+                </Typography>
+                <Typography variant="body2" sx={{ wordWrap: 'break-word' }}>
+                  {item.msg}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  sx={{ color: 'gray', display: 'block', textAlign: 'right' }}
+                >
+                  {formatHHMM(item.date)}
+                </Typography>
+              </Paper>
+            </Box>
+          ))}
+        </Paper>
+
+        <form
+          className="inputform"
+          onSubmit={async (e) => {
+            e.preventDefault();
+            await submitMsg();
+          }}
+          style={{ width: '100%', maxWidth: '600px' }}
+        >
+          <TextField
+            id="text"
+            type="text"
+            value={inputMsg}
+            onChange={(e) => setInputMsg(e.target.value)}
+            placeholder="メッセージを入力..."
+            fullWidth
+            variant="outlined"
+            InputProps={{
+              endAdornment: (
+                <InputAdornment position="end">
+                  <IconButton aria-label="send-message" onClick={() => submitMsg()}>
+                    <Send />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{
+              backgroundColor: 'white',
+              '& .MuiOutlinedInput-root': {
+                borderRadius: '16px',
+              },
+              '& .MuiOutlinedInput-notchedOutline': {
+                borderColor: '#96C78C',
+              },
+            }}
+          />
+        </form>
+
+        <NaviButtons />
+        </>
+      )}
+      {roomName && <VideoConnect room={roomName} />}
     </Paper>
   );
 };

@@ -1,8 +1,10 @@
-import { Snackbar } from '@mui/material';
+import { Snackbar, Button, Box } from '@mui/material';
 import React from 'react';
 import socketClient from 'socket.io-client';
 import { AlertContext } from '../store/useSnackber';
 import { useContext } from 'react';
+import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
+
 
 const SERVER = "http://localhost:3001";
 
@@ -211,13 +213,85 @@ export default function VideoConnect({ room }) {
     }, [isAllowed]);
   
     return (
-      <div className="VideoView">
-        <video playsInline autoPlay muted ref={localVideoRef} />
-        <video playsInline autoPlay ref={remoteVideoRef} />
-        <br />
-        <button onClick={allowJoin} disabled={!isKnocking}>接続</button>
-        <button onClick={calling} disabled={!canCalling}>CALL</button>
-      </div>
+      <Box
+        sx={{
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          alignItems: 'center',
+          padding: 2,
+          gap: 2, // アイテム間のスペース
+        }}
+      >
+        {/* ビデオプレイヤー */}
+        <Box sx={{ display: 'flex', gap: 2, marginBottom: 2,flexDirection: 'column', }}>
+          {/* ローカルビデオ */}
+          <video
+            playsInline
+            autoPlay
+            muted
+            ref={localVideoRef}
+            style={{
+              width: '300px',
+              height: 'auto',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+            }}
+          />
+          {/* リモートビデオ */}
+          <video
+            playsInline
+            autoPlay
+            ref={remoteVideoRef}
+            style={{
+              width: '300px',
+              height: 'auto',
+              borderRadius: '8px',
+              border: '1px solid #ccc',
+            }}
+          />
+        </Box>
+
+        {/* ボタン */}
+        <Box sx={{ display: 'flex', gap: 2 }}>
+          {/* 接続ボタン */}
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={allowJoin}
+            disabled={!isKnocking}
+            sx={{
+              padding: '10px 20px',
+              borderRadius: '8px',
+              minWidth: '120px',
+              backgroundColor: '#4CAF50',
+              '&:hover': {
+                backgroundColor: '#45a049',
+              },
+            }}
+          >
+            接続
+          </Button>
+          {/* CALLボタン */}
+          <Button
+            variant="contained"
+            color="secondary"
+            onClick={calling}
+            disabled={!canCalling}
+            sx={{
+              padding: '10px 20px',
+              borderRadius: '8px',
+              minWidth: '120px',
+              backgroundColor: '#2196F3',
+              '&:hover': {
+                backgroundColor: '#0b7dda',
+              },
+            }}
+          >
+            CALL
+          </Button>
+        </Box>
+      </Box>
     );
   }
   
