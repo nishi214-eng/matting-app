@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from "react";
 import { Box, Typography, Button, Card, CardMedia, CardContent, CircularProgress, Dialog, DialogActions, DialogContent, DialogTitle,IconButton } from "@mui/material";
 import { db } from "../infra/firebase";
@@ -9,7 +10,6 @@ import { useContext } from 'react';
 import ThumbUpAltIcon from '@mui/icons-material/ThumbUpAlt';
 import ReplyIcon from '@mui/icons-material/Reply';
 
-// Candidate型を拡張
 interface Candidate {
   id: string;
   nickName: string;
@@ -20,195 +20,180 @@ interface Candidate {
 }
 
 const MatchingPage: React.FC = () => {
-    const { user } = useAuthContext(); // useAuthContextからユーザー情報を取得
-    const [candidates, setCandidates] = useState<Candidate[]>([]);
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
-    const [matchedCandidate, setMatchedCandidate] = useState<Candidate | null>(null);
-    const [userProfile, setUserProfile] = useState<Candidate | null>(null);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [skippedCandidates, setSkippedCandidates] = useState<Candidate[]>([]); // スキップした候補者
-    const [waitingCandidates, setWaitingCandidates] = useState<Candidate[]>([]); // マッチング待ちの候補者
-    const [openSkipListDialog, setOpenSkipListDialog] = useState<boolean>(false); // スキップリストのダイアログの表示状態
-    const [openMatchingListDialog, setOpenMatchingListDialog] = useState<boolean>(false); // マッチング待ちリストのダイアログの表示状態
-    const userNickName = user?.displayName as string;
+  const { user } = useAuthContext();
+  const [candidates, setCandidates] = useState<Candidate[]>([]);
+  const [currentIndex, setCurrentIndex] = useState<number>(0);
+  const [matchedCandidate, setMatchedCandidate] = useState<Candidate | null>(null);
+  const [userProfile, setUserProfile] = useState<Candidate | null>(null);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [skippedCandidates, setSkippedCandidates] = useState<Candidate[]>([]);
+  const [waitingCandidates, setWaitingCandidates] = useState<Candidate[]>([]);
+  const [openSkipListDialog, setOpenSkipListDialog] = useState<boolean>(false);
+  const [openMatchingListDialog, setOpenMatchingListDialog] = useState<boolean>(false);
+  const userNickName = user?.displayName as string;
+  const [userGender, setUserGender] = useState<string | "">("");
 
     const { showAlert } = useContext(AlertContext);
+  // ユーザーと候補者のデータを取得
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      if (!user) return;
+      try {
 
-    // ユーザーと候補者のデータを取得
-    useEffect(() => {
-      const fetchUserProfile = async () => {
-        if (!user) return; // ログインしていない場合、処理を終了
-        try {
-          const profileDocRef = doc(db, "profiles", userNickName, "profile", "data"); // userNickNameを使ってユーザーのプロフィールを取得
-          const profileDoc = await getDoc(profileDocRef);
-
-          if (profileDoc.exists()) {
-            const profileData = profileDoc.data();
-            setUserProfile({
-              id: userNickName,
-              nickName: profileData.nickName,
-              gender: profileData.gender || "",
-              userImage: profileData.userImage || "",
-              age: profileData.age || "",
-              origin: profileData.origin || "",
-            });
-          } else {
-            console.error("User profile not found");
-          }
-        } catch (error) {
-          console.error("Error fetching user profile: ", error);
+        const profileDocRef = doc(db, "profiles", userNickName, "profile", "data"); // userNickNameを使ってユーザーのプロフィールを取得
+        const profileDoc = await getDoc(profileDocRef);
+        if (profileDoc.exists()) {
+          const profileData = profileDoc.data();
+          setUserProfile({
+            id: userNickName,
+            nickName: profileData.nickName,
+            gender: profileData.gender || "",
+            userImage: profileData.userImage || "",
+            age: profileData.age || "",
+            origin: profileData.origin || "",
+          });
+          setUserGender(profileData.gender || "");
+        } else {
+          console.error("User profile not found");
         }
-      };
+      } catch (error) {
+        console.error("Error fetching user profile: ", error);
+      }
+    };
 
-      const fetchCandidates = async () => {
-        if (!user) return; // ユーザーがいなければ終了
-        try {
-          const querySnapshot = await getDocs(collection(db, "profiles"));
-          const fetchedCandidates: Candidate[] = [];
-          const skippedList: Candidate[] = [];
-          const waitingList: Candidate[] = [];
+    const fetchCandidates = async () => {
+      if (!user) return;
+    
+      try {
+        const querySnapshot = await getDocs(collection(db, "profiles"));
+        const fetchedCandidates: Candidate[] = [];
+        const skippedList: Candidate[] = [];
+        const waitingList: Candidate[] = [];
+    
+        const matchedListSnapshot = await getDocs(collection(db, "profiles", userNickName, "mattingList"));
+        const matchedCandidates = matchedListSnapshot.docs.map(doc => doc.id);
+    
+        for (const docSnapshot of querySnapshot.docs) {
+          const candidateId = docSnapshot.id;
+          
+          if (candidateId !== userNickName && !matchedCandidates.includes(candidateId)) {
+            const profileDocRef = doc(db, "profiles", candidateId, "profile", "data");
+            const profileDoc = await getDoc(profileDocRef);
+            if (profileDoc.exists()) {
+              const profileData = profileDoc.data();
+              const candidate: Candidate = {
+                id: candidateId,
+                nickName: profileData.nickName,
+                gender: profileData.gender || "",
+                userImage: profileData.userImage || "",
+                age: profileData.age || "",
+                origin: profileData.origin || "",
+              };
 
-          for (const docSnapshot of querySnapshot.docs) {
-            const candidateId = docSnapshot.id;
-
-            if (candidateId !== userNickName) { // 自分自身はスキップ
-              const profileDocRef = doc(db, "profiles", candidateId, "profile", "data");
-              const profileDoc = await getDoc(profileDocRef);
-
-              if (profileDoc.exists()) {
-                const profileData = profileDoc.data();
-                const candidate: Candidate = {
-                  id: candidateId,
-                  nickName: profileData.nickName,
-                  gender: profileData.gender || "",
-                  userImage: profileData.userImage || "",
-                  age: profileData.age || "",
-                  origin: profileData.origin || "",
-                };
-
-                // マッチング済みまたはスキップした相手はリストに追加しない
-                const matchedListSnapshot = await getDocs(collection(db, "profiles", candidateId, "mattingList"));
-                const isMatched = matchedListSnapshot.docs.some(doc => doc.id === userNickName);
-
-                if (isMatched) {
-                  setMatchedCandidate(candidate);
-                } else {
-                  // スキップした候補者
-                  const skipListSnapshot = await getDocs(collection(db, "profiles", userNickName, "skipList"));
-                  const isSkipped = skipListSnapshot.docs.some(doc => doc.id === candidateId);
-                  if (isSkipped) {
-                    skippedList.push(candidate);
-                  } else {
-                    waitingList.push(candidate);
-                  }
+    
+              const skipListSnapshot = await getDocs(collection(db, "profiles", userNickName, "skipList"));
+              const isSkipped = skipListSnapshot.docs.some(doc => doc.id === candidateId);
+              if (isSkipped) {
+                skippedList.push(candidate);
+              } else {
+                if ((userGender === "男" && candidate.gender === "女") || (userGender === "女" && candidate.gender === "男")) {
+                  waitingList.push(candidate);
                 }
-                fetchedCandidates.push(candidate);
               }
+              fetchedCandidates.push(candidate);
             }
           }
-
-          setCandidates(waitingList);  // マッチング待ちの候補者リストを設定
-          setSkippedCandidates(skippedList);  // スキップされた候補者リスト
-          setWaitingCandidates(waitingList);  // マッチング待ち候補者
-          setLoading(false); // ローディング完了
-        } catch (error) {
-          console.error("Error fetching candidates: ", error);
         }
-      };
-
-      fetchUserProfile();
-      fetchCandidates();
-    }, [user]); // userが変更された際に再取得
-
-    const fetchNextCandidate = async () => {
-      if (currentIndex + 1 < candidates.length) {
-        setCurrentIndex(prevIndex => prevIndex + 1);
-      } else {
-        showAlert(`候補者がいません！`, "error");
-      }
-    };
-
-    const handleMatch = async () => {
-      if (!user || !userProfile || !candidates[currentIndex]) return;
-
-      const matched = candidates[currentIndex];
-
-      try {
-        await addDoc(collection(db, "profiles", matched.id, "mattingList"), {
-          id: userNickName,
-          nickName: userProfile.nickName, // Only store nickName
-        });
-
-        await addDoc(collection(db, "profiles", userNickName, "mattingList"), {
-          id: matched.id,
-          nickName: matched.nickName, // Only store nickName
-        });
-        showAlert(`${matched.nickName}にいいねしました！`, "success");
-
-        setMatchedCandidate(matched);
-        setCandidates(prevCandidates =>
-          prevCandidates.filter(candidate => candidate.id !== matched.id)
-        );
-        fetchNextCandidate();
+    
+        setCandidates(waitingList);
+        setSkippedCandidates(skippedList);
+        setWaitingCandidates(waitingList);
+        setLoading(false);
       } catch (error) {
-        console.error("Error adding to matching list: ", error);
-        showAlert(`マッチングリストへの追加中にエラーが発生しました。再試行してください。`, "error");
+        console.error("Error fetching candidates: ", error);
       }
     };
 
-    const handleSkip = async () => {
-      if (!user || !candidates[currentIndex]) return;
+    fetchUserProfile();
+    fetchCandidates();
+  }, [user, userGender]);
 
-      const skipped = candidates[currentIndex];
+  const fetchNextCandidate = async () => {
+    if (currentIndex + 1 < candidates.length) {
+      setCurrentIndex(prevIndex => prevIndex + 1);
+    } else {
+      showAlert(`候補者がいません！`,"error");
+    }
+  };
 
-      try {
-        // スキップした候補者をスキップリストに追加
-        await addDoc(collection(db, "profiles", userNickName, "skipList"), {
-          id: skipped.id,
-          nickName: skipped.nickName,
-        });
+  const handleMatch = async () => {
+    if (!user || !userProfile || !candidates[currentIndex]) return;
+    const matched = candidates[currentIndex];
 
-        fetchNextCandidate();
-      } catch (error) {
-        showAlert(`候補者をスキップできませんでした。再試行してください。`, "error");
-      }
-    };
+    try {
+      await addDoc(collection(db, "profiles", matched.id, "mattingList"), {
+        id: userNickName,
 
-    const handleOpenSkipListDialog = () => setOpenSkipListDialog(true);
-    const handleCloseSkipListDialog = () => setOpenSkipListDialog(false);
+        nickName: userProfile.nickName, // Only store nickName
+      });
 
-    const handleOpenMatchingListDialog = () => setOpenMatchingListDialog(true);
-    const handleCloseMatchingListDialog = () => setOpenMatchingListDialog(false);
+      await addDoc(collection(db, "profiles", userNickName, "mattingList"), {
+        id: matched.id,
+        nickName: matched.nickName,
+      });
+      showAlert(`${matched.nickName}にいいねしました！`,"success");
+      setMatchedCandidate(matched);
+      setCandidates(prevCandidates =>
+        prevCandidates.filter(candidate => candidate.id !== matched.id)
+      );
+      fetchNextCandidate();
+    } catch (error) {
+      console.error("Error adding to matching list: ", error);
+      showAlert(`マッチングリストへの追加中にエラーが発生しました。再試行してください。`,"error");
+    }
+  };
 
-    return (
-      <Box sx={{ width:"80vw",maxWidth: "600px",marginLeft:"5vw",marginRight:"5vw", padding: "16px", textAlign: "center" }}>
-        {loading ? (
-          <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
-            <CircularProgress />
-          </Box>
-        ) : candidates.length > 0 && candidates[currentIndex] ? (
-          <Card sx={{ boxShadow: 3, marginBottom: 2 }}>
-            <CardMedia
-                component="img"
-                image={candidates[currentIndex]?.userImage}
-                alt={candidates[currentIndex]?.nickName}
-                sx={{
-                  objectFit: "cover", 
-                  height: '250px', // 高さを300pxに変更
-                  width: '100%', // 幅を100%に指定して親要素にフィットさせる
-                }}
-              />
-            <CardContent>
-              <Typography variant="h5" sx={{ marginBottom: 1 }}>
-                {candidates[currentIndex]?.nickName}
-              </Typography>
-              <Typography variant="body1" sx={{ marginBottom: 2 }}>
-                年齢: {candidates[currentIndex]?.age}
-              </Typography>
-              <Typography variant="body1" sx={{ marginBottom: 2 }}>
-                出身地: {candidates[currentIndex]?.origin}
-              </Typography>
-              <Box sx={{ display: "flex", justifyContent: "space-between" }}>
+  const handleSkip = async () => {
+    if (!user || !candidates[currentIndex]) return;
+    const skipped = candidates[currentIndex];
+
+    try {
+
+      await addDoc(collection(db, "profiles", userNickName, "skipList"), {
+        id: skipped.id,
+        nickName: skipped.nickName,
+      });
+      fetchNextCandidate();
+    } catch (error) {
+      showAlert(`候補者をスキップできませんでした。再試行してください。`,"error");
+    }
+  };
+
+  const handleOpenSkipListDialog = () => setOpenSkipListDialog(true);
+  const handleCloseSkipListDialog = () => setOpenSkipListDialog(false);
+
+  const handleOpenMatchingListDialog = () => setOpenMatchingListDialog(true);
+  const handleCloseMatchingListDialog = () => setOpenMatchingListDialog(false);
+
+  return (
+    <Box sx={{ maxWidth: "800px", margin: "0 auto", padding: "16px", textAlign: "center"}}>
+      {loading ? (
+        <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", height: "300px" }}>
+          <CircularProgress />
+        </Box>
+      ) : candidates.length > 0 && candidates[currentIndex] ? (
+        <Card sx={{ boxShadow: 3, marginBottom: 2 }}>
+          <CardMedia
+            component="img"
+            height="300"
+            image={candidates[currentIndex].userImage || "/images/default-profile.png"}
+            alt={candidates[currentIndex].nickName}
+          />
+          <CardContent>
+            <Typography variant="h5">{candidates[currentIndex].nickName}</Typography>
+            <Typography variant="body2">{candidates[currentIndex].age}歳</Typography>
+            <Typography variant="body2">{candidates[currentIndex].origin}</Typography>
+            <Box sx={{ display: "flex", justifyContent: "space-between" }}>
               <IconButton
                 size="large"
                 sx={{
@@ -236,12 +221,12 @@ const MatchingPage: React.FC = () => {
                   <ReplyIcon fontSize="inherit"/>
                 </IconButton>
               </Box>
-            </CardContent>
-          </Card>
-        ) : (
-          <Typography variant="h6">候補者が見つかりませんでした</Typography>
-        )}
-        <Box sx={{ width:"100%",marginBottom: "16px",display: 'flex', flexDirection: 'column', gap: '6px' }}>
+          </CardContent>
+        </Card>
+      ) : (
+        <Typography variant="h6">候補者が見つかりませんでした。</Typography>
+      )}
+      <Box sx={{ width:"100%",marginBottom: "16px",display: 'flex', flexDirection: 'column', gap: '6px' }}>
         <Button
               variant="contained"
               type="submit"
@@ -275,47 +260,70 @@ const MatchingPage: React.FC = () => {
             マッチング待ちリスト
           </Button>
         </Box>
-        {/* スキップリストダイアログ */}
-        <Dialog open={openSkipListDialog} onClose={handleCloseSkipListDialog}>
-          <DialogTitle>スキップリスト</DialogTitle>
-          <DialogContent>
-            {skippedCandidates.length > 0 ? (
-              skippedCandidates.map((candidate) => (
-                <Typography key={candidate.id} variant="body1">
-                  {candidate.nickName}
-                </Typography>
-              ))
-            ) : (
-              <Typography variant="body1">スキップした候補者はいません。</Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseSkipListDialog}>閉じる</Button>
-          </DialogActions>
-        </Dialog>
 
-        {/* マッチング待ちリストダイアログ */}
-        <Dialog open={openMatchingListDialog} onClose={handleCloseMatchingListDialog}>
-          <DialogTitle>マッチング待ちリスト</DialogTitle>
-          <DialogContent>
-            {waitingCandidates.length > 0 ? (
-              waitingCandidates.map((candidate) => (
-                <Typography key={candidate.id} variant="body1">
-                  {candidate.nickName}
-                </Typography>
-              ))
-            ) : (
-              <Typography variant="body1">マッチング待ちの候補者はいません。</Typography>
-            )}
-          </DialogContent>
-          <DialogActions>
-            <Button onClick={handleCloseMatchingListDialog}>閉じる</Button>
-          </DialogActions>
-        </Dialog>
 
-        <NaviButtons />
-      </Box>
-    );
+      <Dialog open={openSkipListDialog} onClose={handleCloseSkipListDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>スキップリスト</DialogTitle>
+        <DialogContent>
+          {skippedCandidates.length > 0 ? (
+            skippedCandidates.map((candidate) => (
+              <Box key={candidate.id} sx={{ display: "flex", alignItems: "center", marginBottom: 1 }}>
+                <Card sx={{ display: "flex", width: "100%" }}>
+                  <CardMedia
+                    component="img"
+                    image={candidate.userImage || "/images/default-profile.png"}
+                    alt={candidate.nickName}
+                    sx={{ width: 80, height: 80 }}
+                  />
+                  <CardContent>
+                    <Typography variant="body1">{candidate.nickName}</Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2">スキップした候補者はありません。</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseSkipListDialog} color="primary">
+            閉じる
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      <Dialog open={openMatchingListDialog} onClose={handleCloseMatchingListDialog} maxWidth="sm" fullWidth>
+        <DialogTitle>マッチング待ちリスト</DialogTitle>
+        <DialogContent>
+          {waitingCandidates.length > 0 ? (
+            waitingCandidates.map((candidate) => (
+              <Box key={candidate.id} sx={{ display: "flex", alignItems: "center", marginBottom: 1 }}>
+                <Card sx={{ display: "flex", width: "100%" }}>
+                  <CardMedia
+                    component="img"
+                    image={candidate.userImage || "/images/default-profile.png"}
+                    alt={candidate.nickName}
+                    sx={{ width: 80, height: 80 }}
+                  />
+                  <CardContent>
+                    <Typography variant="body1">{candidate.nickName}</Typography>
+                  </CardContent>
+                </Card>
+              </Box>
+            ))
+          ) : (
+            <Typography variant="body2">マッチング待ち候補者はありません。</Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleCloseMatchingListDialog} color="primary">
+            閉じる
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <NaviButtons/>
+    </Box>
+  );
 };
-  
+
 export default MatchingPage;
