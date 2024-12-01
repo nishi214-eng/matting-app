@@ -100,8 +100,8 @@ app.get('*', (req, res) => {
 });
 
 // ポート設定
-const port = 3000;
-server.listen(port, () => {
+const port = process.env.PORT || 10000;  // Renderのデフォルトポート10000を指定
+server.listen(port, '0.0.0.0', () => {
   console.log(`Server running on port ${port}`);
 });
 
