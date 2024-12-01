@@ -101,7 +101,7 @@ app.use(function(err, req, res, next) {
 });
 
 // ポート設定
-const port = process.env.PORT || 3001;
+const port = 3001;
 server.listen(port, () => {
   console.log(`Server running on port ${port}`);
 });
