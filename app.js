@@ -22,10 +22,6 @@ const io = socketIo(server, {
   }
 });
 
-// view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
-
 // ミドルウェア設定
 app.use(logger('dev'));
 app.use(express.json());
