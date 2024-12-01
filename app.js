@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Socket.IOの設定
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:3000','https://localhost:3002','https://192.168.2.103:3002',`https://192.168.2.103:3002/Tel`],// アクセスを許可するURL
+    origin: ['http://localhost:3000',"http://localhost:3001",'http://localhost:3002','http://localhost:10000'],// アクセスを許可するURL
     methods: ['GET', 'POST'],
   }
 });
@@ -101,6 +101,7 @@ app.use(function(err, req, res, next) {
 });
 
 app.get('*', (req, res) => {
+  console.log("aaaa")
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
 
