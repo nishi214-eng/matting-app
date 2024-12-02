@@ -35,7 +35,7 @@ export default function SignUp(){
             const userCredential = await createUserWithEmailAndPassword(auth, email, password);
             // 確認メール内リンクのリダイレクト先のURLを設定
             const actionCodeSettings = {
-                url: "http://localhost:3000/", // リダイレクト先のURL。本番環境では変更する
+                url: "http://matting-app.onrender.com/", // リダイレクト先のURL。本番環境では変更する
                 handleCodeInApp: true,
             };
             //ユーザ登録の確認メールを送信
