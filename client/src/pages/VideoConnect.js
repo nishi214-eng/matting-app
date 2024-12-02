@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 
 
-const SERVER = "https://your-production-server-url.com";
+const SERVER = "https://matting-app.onrender.com";
 
 const socket = socketClient(SERVER);
 

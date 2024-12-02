@@ -122,5 +122,11 @@ app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'client', 'build', 'index.html'));
 });
 
+app.options('*', (req, res) => {
+  res.set('Access-Control-Allow-Origin', '<https://matting-app.onrender.com>');
+  res.set('Access-Control-Allow-Methods', 'GET, POST');
+  res.set('Access-Control-Allow-Headers', 'Content-Type');
+  res.status(204).end();
+});
 
 module.exports = app;
