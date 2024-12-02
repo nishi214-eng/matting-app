@@ -6,7 +6,7 @@ import { useContext } from 'react';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 
 
-const SERVER = "http://0.0.0.0:3000";
+const SERVER = "http://0.0.0.0:3001";
 
 const socket = socketClient(SERVER);
 
