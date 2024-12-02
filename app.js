@@ -21,6 +21,7 @@ const cors = require('cors');
 app.use(cors());
 
 // Socket.IOの設定
+{/*
 const io = socketIo(server, {
   cors: {
     origin: [
@@ -38,6 +39,11 @@ const io = socketIo(server, {
     methods: ['GET', 'POST'],
   }
 });
+*/}
+const io = socketIo(server,{
+  cors: {},
+});
+
 
 // ミドルウェア設定
 app.use(logger('dev'));
