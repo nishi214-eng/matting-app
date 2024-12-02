@@ -9,13 +9,8 @@ const openai = new OpenAI({
 // メッセージが連絡先を要求しているかを判定
 export const detectContactRequest = async (message: string): Promise<boolean> => {
   try {
-    const prompt = `
-以下のメッセージが「連絡先の交換や要求」を意図しているかどうかを判定してください。
-回答は "true" または "false" のみを返してください。
-
-メッセージ:
-${message}
-    `;
+    const prompt = `以下のメッセージが「連絡先の交換や要求」を意図しているかどうかを判定してください。
+回答は "true" または "false" のみを返してください。メッセージ:${message}`;
     
     // GPT-4またはGPT-3.5-turboを使用
     const response = await openai.chat.completions.create({

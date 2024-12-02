@@ -51,6 +51,10 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
   const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
   const [inputMsg, setInputMsg] = useState('');
   const [contactWarning, setContactWarning] = useState(false);  // 連絡先要求警告の状態
+  const isPotentialContactRequest = (message: string): boolean => {
+    const contactKeywords = ["電話番号","メール","住所","連絡先","LINE","@","http",".com",".jp"];
+    return contactKeywords.some((keyword) => message.includes(keyword));
+  };
 
   const { user } = useAuthContext();
   const userName = user?.displayName as string;
@@ -68,16 +72,24 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
     );
   };
 
+
+  
   const submitMsg = async (argMsg?: string) => {
     const message = argMsg || inputMsg;
     if (!message) return;
     if (user) {
-      // メッセージ送信前に連絡先を聞いているか判定
+      if (isPotentialContactRequest(message)) {
+        // 明らかに連絡先を要求している場合は、直接警告を表示
+        setContactWarning(true);
+        return;
+      }
+
+      /* メッセージ送信前に連絡先を聞いているか判定
       const isContactRequest = await detectContactRequest(message);
       if (isContactRequest) {
         setContactWarning(true); // 連絡先要求の場合警告表示
         return; // メッセージ送信しない
-      }
+      }*/
 
       await addDoc(chatRef, {
         name: userName,
