@@ -18,22 +18,7 @@ const server = http.createServer(app);
 const cors = require('cors');
 
 // CORSの設定（Expressで使用）
-app.use(cors({
-  origin: [
-      'https://matting-app.onrender.com',  // 本番環境のURL
-      'http://localhost:3000',             // ローカル開発環境（ポート3000）
-      'http://localhost:3001',             // ローカル開発環境（ポート3001）
-      'http://localhost:3002',             // ローカル開発環境（ポート3002）
-      'http://0.0.0.0:3000', 
-      'http://0.0.0.0:3001',
-      'http://0.0.0.0:3002',               // 0.0.0.0（ローカル環境のIP）
-      'http://127.0.0.1:3000',            // ローカルの127.0.0.1（ローカルテスト用）
-      'http://127.0.0.1:3001',            // ローカルの127.0.0.1（ポート3001用）
-      'http://127.0.0.1:3002',            // ローカルの127.0.0.1（ポート3002用）
-  ],
-  methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type'],
-}));
+app.use(cors());
 
 // Socket.IOの設定
 const io = socketIo(server, {
