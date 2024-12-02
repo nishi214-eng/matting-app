@@ -16,6 +16,7 @@ const firebaseConfig = {
   storageBucket: process.env.REACT_APP_STORAGE_BUCKET,
   messagingSenderId: process.env.REACT_APP_MESSAGIN_SENDERID,
   appId: process.env.REACT_APP_APPID,
+  AIKey: process.env.REACT_APP_OPENAI_API_KEY // 環境変数から API キーを取得
 };
 
 // Initialize Firebase
