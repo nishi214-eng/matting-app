@@ -17,7 +17,7 @@ const server = http.createServer(app);
 // Socket.IOの設定
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:3000',"http://localhost:3001",'http://localhost:3002','http://localhost:10000','http://0.0.0.0:3000', 'http://0.0.0.0:3001','http://0.0.0.0:3002',"https://matting-app.onrender.com/"],// アクセスを許可するURL
+    origin: '*',  // すべてのオリジンを許可
     methods: ['GET', 'POST'],
   }
 });
