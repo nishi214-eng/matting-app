@@ -27,13 +27,13 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start": "react-scripts start --host 0.0.0.0",
+    "start": "HOST=0.0.0.0 react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "client": "cross-env PORT=3001 npm start --prefix client"
   },
-  "proxy": "http://0.0.0.0:3001",
+  "proxy": "http://0.0.0.0:3000",
   "eslintConfig": {
     "extends": [
       "react-app",
