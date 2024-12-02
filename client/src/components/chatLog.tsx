@@ -29,6 +29,7 @@ import {
 import { Send } from '@mui/icons-material';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import VideoConnect from '../pages/VideoConnect';
+import { detectContactRequest } from '../feature/detectContactRequest'; // Featureのインポート
 
 type ChatLog = {
   key: string;
@@ -49,6 +50,11 @@ interface ChatLogViewProps {
 const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
   const [chatLogs, setChatLogs] = useState<ChatLog[]>([]);
   const [inputMsg, setInputMsg] = useState('');
+  const [contactWarning, setContactWarning] = useState(false);  // 連絡先要求警告の状態
+  const isPotentialContactRequest = (message: string): boolean => {
+    const contactKeywords = ["電話番号","メール","住所","連絡先","LINE","@","http",".com",".jp"];
+    return contactKeywords.some((keyword) => message.includes(keyword));
+  };
 
   const { user } = useAuthContext();
   const userName = user?.displayName as string;
@@ -66,10 +72,25 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
     );
   };
 
+
+  
   const submitMsg = async (argMsg?: string) => {
     const message = argMsg || inputMsg;
     if (!message) return;
     if (user) {
+      if (isPotentialContactRequest(message)) {
+        // 明らかに連絡先を要求している場合は、直接警告を表示
+        setContactWarning(true);
+        return;
+      }
+
+      /* メッセージ送信前に連絡先を聞いているか判定
+      const isContactRequest = await detectContactRequest(message);
+      if (isContactRequest) {
+        setContactWarning(true); // 連絡先要求の場合警告表示
+        return; // メッセージ送信しない
+      }*/
+
       await addDoc(chatRef, {
         name: userName,
         msg: message,
@@ -134,6 +155,12 @@ const ChatLogView: React.FC<ChatLogViewProps> = ({ partnerName}) => {
     >
       {user && !roomName && user.displayName && (
         <>
+          {/* 連絡先要求警告 */}
+          {contactWarning && (
+            <Box sx={{ backgroundColor: 'yellow', padding: '10px', borderRadius: '8px', marginBottom: '10px' }}>
+              <Typography variant="body2" color="error">このメッセージには連絡先の要求が含まれている可能性があります。</Typography>
+            </Box>
+          )}
           <Box
             sx={{
               display: 'flex',
