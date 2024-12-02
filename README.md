@@ -1,3 +1,37 @@
+特徴・工夫点
+#開発背景
+
+#使用技術
+フロントエンドの利用技術
+・React
+・firebase
+・MUI
+・Node js
+バックエンドの利用技術
+・Express
+・Node js
+・Socket io
+・web rtc
+デプロイ先
+・Render.com 
+#対応環境
+Chrome(ver.131.0.6778.86以降)
+
+#開発者
+西優太
+藤堂奏大
+杉若百々音
+
+#注意事項
+本ツールの公序良俗に反する使用を禁止します。
+本ツールの営利目的による無断使用を禁止します。
+本ツールの制作者以外の人物による公開、編集、複製、転載、流用、二次配布等を禁止します。
+本ツールの利用にあたって、何らかの不具合やトラブルが生じたとしても、制作者は一切の責任を負いません。 自己責任でご利用ください。
+本ツールに対する個人情報の投稿やプライバシーを侵害する投稿はおやめください。
+#更新情報
+2024/12/2 　 ver1.0.0 公開
+
+
 # Getting Started with Create React App
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
