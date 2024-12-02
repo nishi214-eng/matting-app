@@ -31,7 +31,7 @@ export const ResetPassword = () => {
   
       const actionCodeSettings = {
         // パスワード再設定後のリダイレクト URL本番環境では変更
-        url: 'http://localhost:3000/login',
+        url: 'https://matting-app.onrender.com/',
       }
       try{
         sendPasswordResetEmail(auth, email, actionCodeSettings)

@@ -1,9 +1,9 @@
-const createError = require('http-errors');
+const createError = require('https-errors');
 const express = require('express');
 const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
-const http = require('http');
+const https = require('https');
 const socketIo = require('socket.io');
 
 const indexRouter = require('./routes/index');
@@ -12,12 +12,12 @@ const usersRouter = require('./routes/users');
 const app = express();
 
 // HTTPサーバー作成
-const server = http.createServer(app);
+const server = https.createServer(app);
 
 // Socket.IOの設定
 const io = socketIo(server, {
   cors: {
-    origin: ['http://localhost:3000',"http://localhost:3001",'http://localhost:3002','http://localhost:10000','http://0.0.0.0:3000', 'http://0.0.0.0:3001','http://0.0.0.0:3002',"https://matting-app.onrender.com/"],// アクセスを許可するURL
+    origin: ['https://localhost:3000',"https://localhost:3001",'https://localhost:3002','https://localhost:10000','https://0.0.0.0:3000', 'https://0.0.0.0:3001','https://0.0.0.0:3002',"https://matting-app.onrender.com/"],// アクセスを許可するURL
     methods: ['GET', 'POST'],
   }
 });
