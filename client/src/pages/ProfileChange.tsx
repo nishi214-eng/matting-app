@@ -152,6 +152,7 @@ const ProfileChange: React.FC = () => {
 
             // "data" ドキュメントに profile のデータをセット
             await setDoc(dataDocRef, profile);
+            showAlert(`プロフィールの更新に成功しました`,"success");
             navigate("/Home")
 
         } catch(error){
